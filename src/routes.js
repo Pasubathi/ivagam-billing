@@ -43,7 +43,6 @@ import RTL from "layouts/rtl";
 import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 import Customers from "layouts/customer";
-
 import Profile1 from "layouts/profile1";
 import ChangePassword from "layouts/change-password";
 import CreateProduct from "layouts/create-product";
@@ -151,5 +150,6 @@ const routes = [
     component: <Vendor />,
   },
 ];
+
 
 export default routes;
