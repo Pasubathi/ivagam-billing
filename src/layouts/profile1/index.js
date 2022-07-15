@@ -206,7 +206,7 @@ function profile1() {
 
   const deleteUser = async (id) =>{
     setProfileId(id);
-    alert("Are you sure you want to delete this profile?");
+    alert("Are you sure you want to delete this item?");
     const obj = {
       "profile_id": id
     }
