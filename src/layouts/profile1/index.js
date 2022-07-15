@@ -48,6 +48,7 @@ function profile1() {
   const { columns: pColumns, rows: pRows } = projectsTableData();
   const [ isAddEnable, setAddEnable ] = useState(false);
   const [isLoginFaild, setLoginFaild] = useState(false);
+  const [isDeleteFaild, setDeleteFaild] = useState(false);
   const [user_id, setUserID] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [gst, setGst] = useState('');
@@ -118,6 +119,7 @@ function profile1() {
   const cancelForm = () =>{
     setAddEnable(false);
     setLoginFaild(false);
+    setProfileId('');
     setGst('');
     setCompanyName('');
     setEmail('');
@@ -202,6 +204,20 @@ function profile1() {
     </MDTypography>
   );
 
+  const deleteUser = async (id) =>{
+    setProfileId(id);
+    alert("Are you sure you want to delete this profile?");
+    const obj = {
+      "profile_id": id
+    }
+    const getData = await axios.post(`${api}`, obj).then((response) => {
+      console.log()
+      const msg = getData.message;
+      setDeleteFaild(msg);
+      return response.data;
+    });
+  }
+
   const editUser = async (id) =>{
       setProfileId(id);
       const obj = {
@@ -233,7 +249,6 @@ function profile1() {
        }
   }
 
-
   const generateRow = async (getData) =>{
     const row = [];
     if(getData && getData.length > 0)
@@ -245,9 +260,14 @@ function profile1() {
           company_name: element.compant_name__c,
           address: element.address__c,
           action: (
+           <MDBox> 
             <MDTypography style={{cursor:'pointer'}} onClick={()=>editUser(element.id)} component="a" color="text">
-              <Icon >more_vert</Icon>
+              <Icon>edit</Icon>
             </MDTypography>
+            <MDTypography style={{cursor:'pointer' , paddingLeft:'10px'}} onClick={()=>deleteUser(element.id)} component="a" color="text">
+              <Icon>delete</Icon>
+            </MDTypography>
+          </MDBox>  
           ),
         })
       })
@@ -293,11 +313,18 @@ function profile1() {
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
             <MDBox pt={2} px={2} sx={{ ml: 5 }} display="flex" justifyContent="space-between" alignItems="center">
-              <MDButton onClick={()=>setAddEnable(true)} mt={10} variant="gradient" color="dark">
+              <MDButton onClick={()=>setAddEnable(true)} mt={10} variant="gradient" color="info">
                 <Icon sx={{ fontWeight: "bold" }}>add</Icon>
                 &nbsp;add Profile
               </MDButton>
             </MDBox>
+            {isLoginFaild && (
+                <MDBox mb={2}>
+                    <MDAlert color="error" dismissible>
+                      {alertContent("error")}
+                    </MDAlert>
+                </MDBox>
+                )}
           <Grid item xs={12}>
             <Card>
               <MDBox
@@ -346,10 +373,10 @@ function profile1() {
           </MDBox>
           <MDBox pt={3}>
               <MDBox component="form" role="form">
-                {isLoginFaild && (
+                {isDeleteFaild && (
                 <MDBox mb={2}>
-                    <MDAlert color="error" dismissible>
-                      {alertContent("error")}
+                    <MDAlert color="success" dismissible>
+                      {alertContent("success")}
                     </MDAlert>
                 </MDBox>
                 )}
