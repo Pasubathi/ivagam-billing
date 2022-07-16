@@ -17,15 +17,14 @@ Coded by www.creative-tim.com
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./customer.css";
+import {useNavigate} from 'react-router-dom';
 
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
-import Switch from "@mui/material/Switch";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-import Icon from "@mui/material/Icon";
 import MDButton from "components/MDButton";
 import MDAlert from "components/MDAlert";
 import MDInput from "components/MDInput";
@@ -35,7 +34,6 @@ import { MenuItem } from "@mui/material";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import DataTable from "examples/Tables/DataTable";
 
 // Data
 import projectsTableData from "layouts/tables/data/projectsTableData";
@@ -44,9 +42,7 @@ import { userID } from "../../auth";
 
 const api = process.env.REACT_APP_API_URI;
 
-function payout() {
- 
-   const { columns: pColumns, rows: pRows } = projectsTableData();
+  const { columns: pColumns, rows: pRows } = projectsTableData();
   const [ isAddEnable, setAddEnable ] = useState(false);
   const [isLoginFaild, setLoginFaild] = useState(false);
   const [isDeleteFaild, setDeleteFaild] = useState(false);
@@ -60,8 +56,12 @@ function payout() {
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
   const [payment_mode, setPayment_mode] = useState('');
+  const navigate = useNavigate();
+
+  function payout() {
 
   const cancelForm = () =>{
+    
     setAddEnable(false);
     setLoginFaild(false);
     setPayment_type('');
@@ -73,7 +73,9 @@ function payout() {
     setPayment_mode('');
     setNote('');
     setErrorMsg('');
-  }
+    navigate('/dashboard', {replace: true});
+  };
+
   const handleSubmit = async () =>{
 
       const obj = {
@@ -228,7 +230,7 @@ function payout() {
                 <Grid item xs={12} pb={3}>
                   <Grid container spacing={3}>
                     <Grid item xs={12} md={6} xl={6}>
-                      <MDButton onClick={cancelForm} color="white" fullWidth>
+                     <MDButton  onClick={cancelForm} color="white" fullWidth>
                         Cancel
                       </MDButton>
                     </Grid>
