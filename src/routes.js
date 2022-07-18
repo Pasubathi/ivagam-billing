@@ -50,6 +50,8 @@ import CreateProduct from "layouts/create-product";
 import Vendor from "layouts/vendor";
 import ResetPassword from "layouts/authentication/reset-password";
 import Payout from "layouts/paymentout";
+import Purchase from "layouts/purchase-order";
+
 // @mui icons
 import Icon from "@mui/material/Icon";
 
@@ -157,6 +159,14 @@ const routes = [
     icon: <Icon fontSize="small">person</Icon>,
     route: "/paymentout",
     component: <Payout />,
+  },
+  {
+    type: "collapse",
+    name: "purchase",
+    key: "purchase",
+    icon: <Icon fontSize="small">person</Icon>,
+    route: "/purchase",
+    component: <Purchase />,
   },
 ];
 
