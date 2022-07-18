@@ -49,6 +49,7 @@ import ChangePassword from "layouts/change-password";
 import CreateProduct from "layouts/create-product";
 import Vendor from "layouts/vendor";
 import ResetPassword from "layouts/authentication/reset-password";
+import PurhaseReturn from "layouts/purchase-return";
 // @mui icons
 import Icon from "@mui/material/Icon";
 
@@ -132,6 +133,14 @@ const routes = [
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/create-product",
     component: <CreateProduct />,
+  },
+  {
+    type: "collapse",
+    name: "Purchase Return Debit Note",
+    key: "purchase-return/debit note",
+    icon: <Icon fontSize="small">assignment</Icon>,
+    route: "/purchase-return",
+    component: <PurhaseReturn />,
   },
  {
     type: "collapse",
