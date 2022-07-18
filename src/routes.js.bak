@@ -42,10 +42,13 @@ import Billing from "layouts/billing";
 import RTL from "layouts/rtl";
 import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
-import SignIn from "layouts/authentication/sign-in";
-import SignUp from "layouts/authentication/sign-up";
-import Profile1 from "layouts/profile1";
+import Customers from "layouts/customer";
+
+import Profile1 from "layouts/profile1"
 import ChangePassword from "layouts/change-password";
+import CreateProduct from "layouts/create-product";
+import Vendor from "layouts/vendor";
+import Purchase from "layouts/purchase";
 import ResetPassword from "layouts/authentication/reset-password";
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -58,6 +61,14 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
+  },
+  {
+    type: "collapse",
+    name: "Customers",
+    key: "customers",
+    icon: <Icon fontSize="small">table_view</Icon>,
+    route: "/customers",
+    component: <Customers />,
   },
   {
     type: "collapse",
@@ -109,22 +120,6 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Sign In",
-    key: "sign-in",
-    icon: <Icon fontSize="small">login</Icon>,
-    route: "/sign-in",
-    component: <SignIn />,
-  },
-  {
-    type: "collapse",
-    name: "Sign Up",
-    key: "sign-up",
-    icon: <Icon fontSize="small">assignment</Icon>,
-    route: "/authentication/sign-up",
-    component: <SignUp />,
-  },
-  {
-    type: "collapse",
     name: "Change Password",
     key: "change-password",
     icon: <Icon fontSize="small">assignment</Icon>,
@@ -133,11 +128,28 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Forgot Password",
-    key: "reset-password",
+    name: "Product Services",
+    key: "product-services",
     icon: <Icon fontSize="small">assignment</Icon>,
-    route: "/authentication/reset-password",
-    component: <ResetPassword />,
+    route: "/create-product",
+    component: <CreateProduct />,
+  },
+ 
+  {
+    type: "collapse",
+    name: "Vendor",
+    key: "vendor",
+    icon: <Icon fontSize="small">assignment</Icon>,
+    route: "/vendor",
+    component: <Vendor />,
+  },
+  {
+    type: "collapse",
+    name: "Purchase",
+    key: "purchase",
+    icon: <Icon fontSize="small">assignment</Icon>,
+    route: "/purchase",
+    component: <Purchase />,
   },
 ];
 

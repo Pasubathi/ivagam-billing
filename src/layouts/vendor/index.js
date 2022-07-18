@@ -138,7 +138,7 @@ function Vendors() {
       { Header: "action", accessor: "action", align: "center" },
     ]
   )
-  const [ customers, setCustomers ] = useState([]);
+  const [ vendors, setVendors ] = useState([]);
 
   const alertContent = () => (
     <MDTypography variant="body2" color="white">
@@ -191,11 +191,11 @@ function Vendors() {
           ),
         })
       })
-      setCustomers(row);
+      setVendors(row);
     }
   }
   
-  const getCustomers = async (user) =>{
+  const getVendors = async (user) =>{
       const obj = {
         "user_id": user
       }
@@ -220,7 +220,7 @@ function Vendors() {
     if(user)
     {
       setUserID(user);
-      getCustomers(user);
+      getVendors(user);
     }else{
       window.location = "/sign-in"
     }
@@ -255,7 +255,7 @@ function Vendors() {
               </MDBox>
               <MDBox pt={3}>
                 <DataTable
-                  table={{ columns: column, rows: customers }}
+                  table={{ columns: column, rows: vendors }}
                   isSorted={false}
                   entriesPerPage={false}
                   showTotalEntries={false}

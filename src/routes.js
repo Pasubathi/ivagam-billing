@@ -48,6 +48,7 @@ import Profile1 from "layouts/profile1"
 import ChangePassword from "layouts/change-password";
 import CreateProduct from "layouts/create-product";
 import Vendor from "layouts/vendor";
+import Purchase from "layouts/purchase";
 import ResetPassword from "layouts/authentication/reset-password";
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -133,14 +134,6 @@ const routes = [
     route: "/create-product",
     component: <CreateProduct />,
   },
- {
-    type: "collapse",
-    name: "Forgot Password",
-    key: "reset-password",
-    icon: <Icon fontSize="small">assignment</Icon>,
-    route: "/authentication/reset-password",
-    component: <ResetPassword />,
-  },
   {
     type: "collapse",
     name: "Vendor",
@@ -148,6 +141,14 @@ const routes = [
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/vendor",
     component: <Vendor />,
+  },
+  {
+    type: "collapse",
+    name: "Purchase",
+    key: "purchase",
+    icon: <Icon fontSize="small">assignment</Icon>,
+    route: "/purchase",
+    component: <Purchase />,
   },
 ];
 
