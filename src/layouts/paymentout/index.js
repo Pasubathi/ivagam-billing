@@ -42,6 +42,9 @@ import { userID } from "../../auth";
 
 const api = process.env.REACT_APP_API_URI;
 
+
+function payout() {
+
   const { columns: pColumns, rows: pRows } = projectsTableData();
   const [ isAddEnable, setAddEnable ] = useState(false);
   const [isLoginFaild, setLoginFaild] = useState(false);
@@ -58,7 +61,6 @@ const api = process.env.REACT_APP_API_URI;
   const [payment_mode, setPayment_mode] = useState('');
   const navigate = useNavigate();
 
-  function payout() {
 
   const cancelForm = () =>{
     
