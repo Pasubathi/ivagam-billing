@@ -1,0 +1,48 @@
+.select-input-styles {
+    padding: 12px 0;
+}
+
+.select-input-styles svg {
+    display: block;
+    width: 2em;
+    height: 2em;
+    top: calc(50% - 1em);
+}
+.div234 {
+    width: 500px;
+    height: 300px;
+    margin-top: 40px;
+    margin-left: 600px;
+    font-weight: bold;
+    border-radius: 3%;
+    font-size: 16px;
+    border: 1px solid rgb(73, 70, 70);
+  }
+  .totalboxtr{
+    padding-left: 10px;
+    padding-top: 10px;
+  }
+  .totalnumbertd{
+    padding-left: 150px;
+  }
+  .entertextinput{
+    margin-top: 48px;
+    width: 1050px;
+    height: 120px;
+    margin-left: 40px;
+    border-radius: 3px;
+  }
+  .tableinputbox{
+    padding-top:12px;
+    width:90px;
+    height:47px;
+    border-radius: 7%;
+  }
+  .tablehead{
+    padding-left:35px;
+    font-size:17px;
+  }
+  .tablelinetd{
+    padding-left:35px;
+    padding-top:17px;
+  }

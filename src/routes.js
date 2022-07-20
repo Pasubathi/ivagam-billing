@@ -9,9 +9,13 @@ import Profile1 from "layouts/profile1";
 import ChangePassword from "layouts/change-password";
 import CreateProduct from "layouts/create-product";
 import Vendor from "layouts/vendor";
+import Purchase from "layouts/purchase";
 import Expense from "layouts/expense";
 import ResetPassword from "layouts/authentication/reset-password";
+import PurhaseReturn from "layouts/purchase-return";
 import Payout from "layouts/paymentout";
+import PurchaseOrder from "layouts/purchase-order";
+
 // @mui icons
 import Icon from "@mui/material/Icon";
 
@@ -96,6 +100,14 @@ const routes = [
     route: "/create-product",
     component: <CreateProduct />,
   },
+  {
+    type: "collapse",
+    name: "Purchase Return Debit Note",
+    key: "purchase-return/debit note",
+    icon: <Icon fontSize="small">assignment</Icon>,
+    route: "/purchase-return",
+    component: <PurhaseReturn />,
+  },
  {
     type: "collapse",
     name: "Forgot Password",
@@ -114,6 +126,14 @@ const routes = [
   },
   {
     type: "collapse",
+    name: "Purchase",
+    key: "purchase",
+    icon: <Icon fontSize="small">assignment</Icon>,
+    route: "/purchase",
+    component: <Purchase />,
+  },
+  {
+	type: "collapse",
     name: "Paymentout",
     key: "Paymentout",
     icon: <Icon fontSize="small">person</Icon>,
@@ -126,6 +146,14 @@ const routes = [
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/expense",
     component: <Expense />,
+  },
+  {
+    type: "collapse",
+    name: "purchase",
+    key: "purchase",
+    icon: <Icon fontSize="small">person</Icon>,
+    route: "/purchase",
+    component: <PurchaseOrder />,
   },
 ];
 

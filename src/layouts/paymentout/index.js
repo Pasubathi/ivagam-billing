@@ -16,7 +16,7 @@ Coded by www.creative-tim.com
 // @mui material components
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./customer.css";
+import "./payout.css";
 import {useNavigate} from 'react-router-dom';
 
 import Grid from "@mui/material/Grid";
@@ -46,8 +46,8 @@ const api = process.env.REACT_APP_API_URI;
 function payout() {
 
   const { columns: pColumns, rows: pRows } = projectsTableData();
-  const [ isAddEnable, setAddEnable ] = useState(false);
   const [isLoginFaild, setLoginFaild] = useState(false);
+  const [ isAddEnable, setAddEnable ] = useState(false);
   const [isDeleteFaild, setDeleteFaild] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [user_id, setUserID] = useState('');
@@ -60,7 +60,6 @@ function payout() {
   const [note, setNote] = useState('');
   const [payment_mode, setPayment_mode] = useState('');
   const navigate = useNavigate();
-
 
   const cancelForm = () =>{
     
