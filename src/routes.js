@@ -12,6 +12,7 @@ import Vendor from "layouts/vendor";
 import Purchase from "layouts/purchase";
 import Expense from "layouts/expense";
 import ResetPassword from "layouts/authentication/reset-password";
+import PurhaseReturn from "layouts/purchase-return";
 import Payout from "layouts/paymentout";
 import PurchaseOrder from "layouts/purchase-order";
 
@@ -98,6 +99,22 @@ const routes = [
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/create-product",
     component: <CreateProduct />,
+  },
+  {
+    type: "collapse",
+    name: "Purchase Return Debit Note",
+    key: "purchase-return/debit note",
+    icon: <Icon fontSize="small">assignment</Icon>,
+    route: "/purchase-return",
+    component: <PurhaseReturn />,
+  },
+ {
+    type: "collapse",
+    name: "Forgot Password",
+    key: "reset-password",
+    icon: <Icon fontSize="small">assignment</Icon>,
+    route: "/authentication/reset-password",
+    component: <ResetPassword />,
   },
   {
     type: "collapse",
