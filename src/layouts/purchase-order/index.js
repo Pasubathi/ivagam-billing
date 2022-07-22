@@ -44,6 +44,7 @@ import { userID } from "../../auth";
 const api = process.env.REACT_APP_API_URI;
 
 function Purchase() {
+
   const { columns: pColumns, rows: pRows } = projectsTableData();
   const [ isAddEnable, setAddEnable ] = useState(false);
   const [isLoginFaild, setLoginFaild] = useState(false);
@@ -75,7 +76,15 @@ function Purchase() {
   const [sgst, setSGST] = useState('');
   const [total_amount, setTotalAmount] = useState('');
   const [purchase_note, setPurchaseNote] = useState('');
-  const [products, setProduct] = useState(['']);
+  const [products, setProduct] = useState([{
+                                            "product_name":"",
+                                            "description":"",
+                                            "hsn":"",
+                                            "rate":"",
+                                            "quantity":"",
+                                            "tax_rate":"",
+                                            "discount":"",
+                                            "amount":"" }]);
   
   
   const handleUpdate = async () =>{
@@ -162,6 +171,9 @@ function Purchase() {
     setMobileNumber('');
     setVendorAddress('');
     setDeliveryTo('');
+    setPlace('');
+    setTaxtype('');
+    setVendor_gst('');
     setProduct('');
     setProductName('');
     setDescription('');
@@ -280,7 +292,6 @@ function Purchase() {
       });
        if (getData.status === 'success') {
           const getRows = getData.data;
-           
           setAddEnable(true);
           setOrder_no(getRows && getRows.purchase_order_no__c?getRows.purchase_order_no__c:'');
           setVendor_gst(getRows && getRows.vendor_gstin__c?getRows.vendor_gstin__c:'');
@@ -301,6 +312,7 @@ function Purchase() {
           setPurchaseNote(getRows && getRows.purchase_note__c?getRows.purchase_note__c:'');
           setProduct(getRows && getRows.products?getRows.products:'');
        }
+      
         else {
          const msg = getData.message;
        }
@@ -354,7 +366,8 @@ function Purchase() {
     } catch (error) {
       console.error(`Error ${error}`);
     }
-  }
+  };
+
   useEffect(async ()=>{
     const user = await userID();
     if(user)
@@ -365,7 +378,6 @@ function Purchase() {
       window.location = "/sign-in"
     }
   },[isAddEnable])
-
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -514,39 +526,38 @@ function Purchase() {
                     </thead>
                 <hr style={{width:"675%",marginTop:"15px",marginRight:"0",marginLeft:"15px"}}/>
                     <tbody>
-                   {products && products.length > 0 && products.map((element, index) => (
-
-                    <tr key={`product-${element.id}`}> 
-                        <th className="tablelinetd" style={{fontSize:"17px"}} scope="row"> 
-                        <input type="text" value1={product_name} onChange={(e)=>setProductName(e.target.value)} className="tableinputbox" style={{ width:"120px"}}
-                        value={element.product_name__c} />
-                        </th>
-                        <td className="tablelinetd" data-title="Released">
-                        <input type="text" value={description} onChange={(e)=>setDescription(e.target.value)} className="tableinputbox" style={{width:"140px"}}/>
-                        </td>
-                        <td className="tablelinetd" data-title="Studio">
-                        <input type="text" value={hsn} onChange={(e)=>setHSN(e.target.value)} className="tableinputbox" style={{width:"60px"}}/>
-                        </td>
-                        <td className="tablelinetd" data-title="Worldwide Gross" data-type="currency">
-                        <input type="text" value={rate} onChange={(e)=>setRate(e.target.value)} className="tableinputbox"/>
-                        </td>
-                        <td data-title="Domestic Gross"  className="tablelinetd" data-type="currency">
-                        <input type="text" value={quantity} onChange={(e)=>setQty(e.target.value)} className="tableinputbox"/>
-                        </td>
-                        <td data-title="International Gross"  className="tablelinetd" data-type="currency">
-                        <input type="text" value={tax_rate} onChange={(e)=>setTaxRate(e.target.value)} className="tableinputbox"/>
-                        </td>
-                        <td data-title="Budget"  className="tablelinetd" data-type="currency">
-                        <input type="text" value={discount} onChange={(e)=>setDiscount(e.target.value)} className="tableinputbox"/>
-                        </td>
-                        <td data-title="Budget"  className="tablelinetd" data-type="currency">
-                        <input type="text" value={amount} onChange={(e)=>setAmount(e.target.value)} className="tableinputbox"/>
-                        </td>
-                    </tr>
-                   ))} 
-                    </tbody>
-                    <hr style={{width:"675%",marginTop:"18px",marginRight:"0",marginLeft:"15px"}}/>
+                        <tr> 
+                            <th className="tablelinetd" style={{fontSize:"17px"}} scope="row"> 
+                            <input type="text" name="interest" value={product_name} onChange={(e)=>setProductName(e.target.value)} className="tableinputbox" style={{ width:"120px"}}/>
+                            </th>
+                            <td className="tablelinetd" data-title="Released">
+                            <input type="text" name="interest"  value={description} onChange={(e)=>setDescription(e.target.value)} className="tableinputbox" style={{width:"140px"}}/>
+                            </td>
+                            <td className="tablelinetd" data-title="Studio">
+                            <input type="text" name="interest" value={hsn} onChange={(e)=>setHSN(e.target.value)} className="tableinputbox" style={{width:"60px"}}/>
+                            </td>
+                            <td className="tablelinetd" data-title="Worldwide Gross" data-type="currency">
+                            <input type="text" name="interest" value={rate} onChange={(e)=>setRate(e.target.value)} className="tableinputbox"/>
+                            </td>
+                            <td data-title="Domestic Gross"  className="tablelinetd" data-type="currency">
+                            <input type="text" name="interest" value={quantity} onChange={(e)=>setQty(e.target.value)} className="tableinputbox"/>
+                            </td>
+                            <td data-title="International Gross"  className="tablelinetd" data-type="currency">
+                            <input type="text" name="interest" value={tax_rate} onChange={(e)=>setTaxRate(e.target.value)} className="tableinputbox"/>
+                            </td>
+                            <td data-title="Budget"  className="tablelinetd" data-type="currency">
+                            <input type="text" name="interest" value={discount} onChange={(e)=>setDiscount(e.target.value)} className="tableinputbox"/>
+                            </td>
+                            <td data-title="Budget"  className="tablelinetd" data-type="currency">
+                            <input type="text" name="interest" value={amount} onChange={(e)=>setAmount(e.target.value)} className="tableinputbox"/>
+                            </td>
+                        </tr>
+                </tbody>
+                    <hr style={{width:"675%",marginTop:"18px",marginRight:"0",marginLeft:"15px" }}/> 
                 </table>
+                    <MDButton style={{marginLeft:"60px", marginTop:"20px"}} mt={6} variant="gradient" color="info">
+                        <Icon >add</Icon> &nbsp; Add Product
+                    </MDButton>
                 <div className="div234">
                     <tr>
                         <td className="totalboxtr">
