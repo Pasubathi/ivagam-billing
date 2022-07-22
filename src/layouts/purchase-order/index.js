@@ -44,6 +44,7 @@ import { userID } from "../../auth";
 const api = process.env.REACT_APP_API_URI;
 
 function Purchase() {
+
   const { columns: pColumns, rows: pRows } = projectsTableData();
   const [ isAddEnable, setAddEnable ] = useState(false);
   const [isLoginFaild, setLoginFaild] = useState(false);
@@ -75,33 +76,46 @@ function Purchase() {
   const [sgst, setSGST] = useState('');
   const [total_amount, setTotalAmount] = useState('');
   const [purchase_note, setPurchaseNote] = useState('');
+  const [products, setProduct] = useState([{
+                                            "product_name":"",
+                                            "description":"",
+                                            "hsn":"",
+                                            "rate":"",
+                                            "quantity":"",
+                                            "tax_rate":"",
+                                            "discount":"",
+                                            "amount":"" }]);
   
   
   const handleUpdate = async () =>{
     const obj = {
-      "purchase_id": purchaseId,
-      "order_no": order_no,
-      "name": name,
-      "delivety_date": delivery_date,
+      "pre_purchase_id": purchaseId,
+      "purchase_order_no": order_no,
+      "vendor_gstin": gst_no,
+      "vendor_name": name,
+      "delivery_date": delivery_date,
       "delivery_address": delivery_address,
-      "shipment_prefrence": shipment_prefrence,
-      "purchase_order_date": purchase_order_date,
-      "mobile_number": mobile_number,
+      "place_of_supply": place,
+      "shipment_preference": shipment_prefrence,
+      "purchase_date": purchase_order_date,
+      "vendor_mob_no": mobile_number,
       "vendor_address": vendor_address,
       "delivery_to": delivery_to,
-      "product_name": product_name,
-      "description" : description,
-      "hsn": hsn,
-      "rate": rate,
-      "quantity":quantity,
-      "tax_rate": tax_rate,
-      "discount": discount,
-      "amount": amount,
+      "tax_type" : tax_type,
       "subtotal": subtotal,
       "cgst": cgst,
       "sgst": sgst,
       "total_amount": total_amount,
-      "purchase_note": purchase_note,
+      "purchase_note":purchase_note,
+      "products": [ 
+                    {"product_name": product_name,
+                    "description" : description,
+                    "hsn": hsn,
+                    "rate":rate,
+                    "quantity":quantity,
+                    "tax_rate":tax_rate,
+                    "discount": discount,
+                    "amount": amount,} ]
     }
     const getData = await axios.post(`${api}update_prepurchase`, obj).then((response) => {
       console.log();
@@ -121,6 +135,7 @@ function Purchase() {
        setMobileNumber('');
        setVendorAddress('');
        setDeliveryTo('');
+       setProduct('');
        setProductName('');
        setDescription('');
        setHSN('');
@@ -156,6 +171,10 @@ function Purchase() {
     setMobileNumber('');
     setVendorAddress('');
     setDeliveryTo('');
+    setPlace('');
+    setTaxtype('');
+    setVendor_gst('');
+    setProduct('');
     setProductName('');
     setDescription('');
     setHSN('');
@@ -187,20 +206,21 @@ function Purchase() {
         "vendor_address": vendor_address,
         "delivery_to": delivery_to,
         "tax_type" : tax_type,
-        "product_name": product_name,
-        "description" : description,
-        "hsn": hsn,
-        "rate":rate,
-        "quantity":quantity,
-        "tax_rate":tax_rate,
-        "discount": discount,
-        "amount": amount,
         "subtotal": subtotal,
         "cgst": cgst,
         "sgst": sgst,
         "total_amount": total_amount,
         "purchase_note":purchase_note,
-      }
+        "products":[ 
+                    {"product_name": product_name,
+                    "description" : description,
+                    "hsn": hsn,
+                    "rate":rate,
+                    "quantity":quantity,
+                    "tax_rate":tax_rate,
+                    "discount": discount,
+                    "amount": amount,} ]
+         }
       const getData = await axios.post(`${api}add_prepurchase`, obj).then((response) => {
         console.log();
         return response.data;
@@ -218,6 +238,8 @@ function Purchase() {
          setPurchaseOrderDate('');
          setVendorAddress('');
          setDeliveryTo('');
+         setProduct('');
+         setProductName('');
          setPlace('');
          setDescription('');
          setHSN('');
@@ -262,27 +284,40 @@ function Purchase() {
   const editUser = async (id) =>{
       setPurchaseId(id);
       const obj = {
-        "purchase_id": id
+        "pre_purchase_id": id
       }
-      const getData = await axios.post(`${api}get_purchase_by_id`, obj).then((response) => {
+      const getData = await axios.post(`${api}get_prepurchase_by_id`, obj).then((response) => {
         console.log()
         return response.data;
       });
        if (getData.status === 'success') {
           const getRows = getData.data;
           setAddEnable(true);
-          setOrder_no(getRows && getRows.gstin__c?getRows.gstin__c:'');
-          setName(getRows && getRows.name__c?getRows.name__c:'');
-          setDeliveryDate(getRows && getRows.address__c?getRows.address__c:'');
-          setDeliveryAddress(getRows && getRows.phone__c?getRows.phone__c:'');
-          setShipment_prefrence(getRows && getRows.license_number__c?getRows.license_number__c:'');
-          setPurchaseOrderDate(getRows && getRows.license_title__c?getRows.license_title__c:'');
-          setMobileNumber(getRows && getRows.entity_type__c?getRows.entity_type__c:'');
-       } else {
+          setOrder_no(getRows && getRows.purchase_order_no__c?getRows.purchase_order_no__c:'');
+          setVendor_gst(getRows && getRows.vendor_gstin__c?getRows.vendor_gstin__c:'');
+          setName(getRows && getRows.vendor_name__c?getRows.vendor_name__c:'');
+          setDeliveryDate(getRows && getRows.delivery_date__c?getRows.delivery_date__c:'');
+          setDeliveryAddress(getRows && getRows.delivery_address__c?getRows.delivery_address__c:'');
+          setPlace(getRows && getRows.place_of_supply__c?getRows.place_of_supply__c:'');
+          setTaxtype(getRows && getRows.tax_type__c?getRows.tax_type__c:'');
+          setShipment_prefrence(getRows && getRows.shipment_preference__c?getRows.shipment_preference__c:'');
+          setPurchaseOrderDate(getRows && getRows.date__c?getRows.date__c:'');
+          setMobileNumber(getRows && getRows.vendor_mob_no__c?getRows.vendor_mob_no__c:'');
+          setVendorAddress(getRows && getRows.vendor_address__c?getRows.vendor_address__c:'');
+          setDeliveryTo(getRows && getRows.delivery_to__c?getRows.delivery_to__c:'');
+          setSubTotal(getRows && getRows.subtotal__c?getRows.subtotal__c:'');
+          setCGST(getRows && getRows.cgst__c?getRows.cgst__c:'');
+          setSGST(getRows && getRows.sgst__c?getRows.sgst__c:'');
+          setTotalAmount(getRows && getRows.total_amount__c?getRows.total_amount__c:'');
+          setPurchaseNote(getRows && getRows.purchase_note__c?getRows.purchase_note__c:'');
+          setProduct(getRows && getRows.products?getRows.products:'');
+       }
+      
+        else {
          const msg = getData.message;
        }
+      
   }
-
 
   const generateRow = async (getData) =>{
     const row = [];
@@ -297,9 +332,14 @@ function Purchase() {
           purchase_no:element.purchase_order_no__c,
           status: element.status__c,
           action: (
+            <MDBox> 
             <MDTypography style={{cursor:'pointer'}} onClick={()=>editUser(element.id)} component="a" color="text">
-              <Icon >more_vert</Icon>
+              <Icon>edit</Icon>
             </MDTypography>
+            <MDTypography style={{cursor:'pointer' , paddingLeft:'10px'}} onClick={()=>editUser(element.id)} component="a" color="text">
+              <Icon>delete</Icon>
+            </MDTypography>
+          </MDBox>  
           ),
         })
       })
@@ -326,7 +366,8 @@ function Purchase() {
     } catch (error) {
       console.error(`Error ${error}`);
     }
-  }
+  };
+
   useEffect(async ()=>{
     const user = await userID();
     if(user)
@@ -414,7 +455,7 @@ function Purchase() {
                   <MDInput type="text" label="Vendor Name" onChange={(e)=>setName(e.target.value)} value={name} fullWidth required />
                 </MDBox>
                 <MDBox mb={2} mx={4}>
-                  <MDInput type="text" onChange={(e)=>setDeliveryDate(e.target.value)} value={delivery_date} label="Expected Delivery Date" fullWidth />
+                  <MDInput type="date" onChange={(e)=>setDeliveryDate(e.target.value)} value={delivery_date} label="Expected Delivery Date" fullWidth />
                 </MDBox>
                 <MDBox mb={2}  mx={4}>
                   <MDInput type="text" label="Delivery Address" onChange={(e)=>setDeliveryAddress(e.target.value)} value={delivery_address} fullWidth />
@@ -458,7 +499,7 @@ function Purchase() {
                   </MDInput>
                 </MDBox>
                 <MDBox mb={2} mx={4}>
-                  <MDInput type="text" onChange={(e)=>setPurchaseOrderDate(e.target.value)} label="Purchase Order Date" value={purchase_order_date} fullWidth />
+                  <MDInput type="date" onChange={(e)=>setPurchaseOrderDate(e.target.value)} label="Purchase Order Date" value={purchase_order_date} fullWidth />
                 </MDBox>
                 <MDBox mb={2}  mx={4}>
                   <MDInput type="text" label="Vendor Mobile Number" onChange={(e)=>setMobileNumber(e.target.value)} value={mobile_number} fullWidth required />
@@ -485,35 +526,38 @@ function Purchase() {
                     </thead>
                 <hr style={{width:"675%",marginTop:"15px",marginRight:"0",marginLeft:"15px"}}/>
                     <tbody>
-                    <tr>
-                        <th className="tablelinetd" style={{fontSize:"17px"}} scope="row">
-                        <input type="text" value={product_name} onChange={(e)=>setProductName(e.target.value)} className="tableinputbox" style={{ width:"120px"}}/>
-                        </th>
-                        <td className="tablelinetd" data-title="Released">
-                        <input type="text" value={description} onChange={(e)=>setDescription(e.target.value)} className="tableinputbox" style={{width:"140px"}}/>
-                        </td>
-                        <td className="tablelinetd" data-title="Studio">
-                        <input type="text" value={hsn} onChange={(e)=>setHSN(e.target.value)} className="tableinputbox" style={{width:"60px"}}/>
-                        </td>
-                        <td className="tablelinetd" data-title="Worldwide Gross" data-type="currency">
-                        <input type="text" value={rate} onChange={(e)=>setRate(e.target.value)} className="tableinputbox"/>
-                        </td>
-                        <td data-title="Domestic Gross"  className="tablelinetd" data-type="currency">
-                        <input type="text" value={quantity} onChange={(e)=>setQty(e.target.value)} className="tableinputbox"/>
-                        </td>
-                        <td data-title="International Gross"  className="tablelinetd" data-type="currency">
-                        <input type="text" value={tax_rate} onChange={(e)=>setTaxRate(e.target.value)} className="tableinputbox"/>
-                        </td>
-                        <td data-title="Budget"  className="tablelinetd" data-type="currency">
-                        <input type="text" value={discount} onChange={(e)=>setDiscount(e.target.value)} className="tableinputbox"/>
-                        </td>
-                        <td data-title="Budget"  className="tablelinetd" data-type="currency">
-                        <input type="text" value={amount} onChange={(e)=>setAmount(e.target.value)} className="tableinputbox"/>
-                        </td>
-                    </tr>
-                    </tbody>
-                    <hr style={{width:"675%",marginTop:"18px",marginRight:"0",marginLeft:"15px"}}/>
+                        <tr> 
+                            <th className="tablelinetd" style={{fontSize:"17px"}} scope="row"> 
+                            <input type="text" name="interest" value={product_name} onChange={(e)=>setProductName(e.target.value)} className="tableinputbox" style={{ width:"120px"}}/>
+                            </th>
+                            <td className="tablelinetd" data-title="Released">
+                            <input type="text" name="interest"  value={description} onChange={(e)=>setDescription(e.target.value)} className="tableinputbox" style={{width:"140px"}}/>
+                            </td>
+                            <td className="tablelinetd" data-title="Studio">
+                            <input type="text" name="interest" value={hsn} onChange={(e)=>setHSN(e.target.value)} className="tableinputbox" style={{width:"60px"}}/>
+                            </td>
+                            <td className="tablelinetd" data-title="Worldwide Gross" data-type="currency">
+                            <input type="text" name="interest" value={rate} onChange={(e)=>setRate(e.target.value)} className="tableinputbox"/>
+                            </td>
+                            <td data-title="Domestic Gross"  className="tablelinetd" data-type="currency">
+                            <input type="text" name="interest" value={quantity} onChange={(e)=>setQty(e.target.value)} className="tableinputbox"/>
+                            </td>
+                            <td data-title="International Gross"  className="tablelinetd" data-type="currency">
+                            <input type="text" name="interest" value={tax_rate} onChange={(e)=>setTaxRate(e.target.value)} className="tableinputbox"/>
+                            </td>
+                            <td data-title="Budget"  className="tablelinetd" data-type="currency">
+                            <input type="text" name="interest" value={discount} onChange={(e)=>setDiscount(e.target.value)} className="tableinputbox"/>
+                            </td>
+                            <td data-title="Budget"  className="tablelinetd" data-type="currency">
+                            <input type="text" name="interest" value={amount} onChange={(e)=>setAmount(e.target.value)} className="tableinputbox"/>
+                            </td>
+                        </tr>
+                </tbody>
+                    <hr style={{width:"675%",marginTop:"18px",marginRight:"0",marginLeft:"15px" }}/> 
                 </table>
+                    <MDButton style={{marginLeft:"60px", marginTop:"20px"}} mt={6} variant="gradient" color="info">
+                        <Icon >add</Icon> &nbsp; Add Product
+                    </MDButton>
                 <div className="div234">
                     <tr>
                         <td className="totalboxtr">
