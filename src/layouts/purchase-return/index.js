@@ -162,11 +162,11 @@ function Purchase() {
   const [ column, setColumn ] = useState(
     [
       { Header: "Date", accessor: "date", width: "10%", align: "left" },
-	  { Header: "Purchase no.", accessor: "purchase_no", align: "center" },
+	    { Header: "Purchase no.", accessor: "purchase_no", align: "center" },
       { Header: "Product", accessor: "product", align: "left" },
       { Header: "Vendor name", accessor: "vendor_name", align: "center" },
-	  { Header: "Amount", accessor: "amount", align: "center" },
-	  { Header: "Status", accessor: "status", align: "center" },
+	    { Header: "Amount", accessor: "amount", align: "center" },
+	    { Header: "Status", accessor: "status", align: "center" },
       { Header: "action", accessor: "action", align: "center" },
     ]
   )
@@ -180,6 +180,22 @@ function Purchase() {
     </MDTypography>
   );
 
+  const deleteUser = async (id) =>{
+    setDebitID(id);
+      const obj = {
+        "debit_id": id
+      }
+      const getData = await axios.post(`${api}delete_debit_note`, obj).then((response) => {
+        console.log();
+        return response.data;
+      });
+      if (getData.status === 'success') {
+        const getRows = getData.data;
+        window.location = "/purchase-return"
+      } else {
+        const msg = getData.message;
+      }
+    }
   const editUser = async (id) =>{
     setDebitID(id);
       const obj = {
@@ -222,14 +238,19 @@ function Purchase() {
         row.push({
             date: element.date__c,
             purchase_no: element.purchase_invoice_no__c,
-            product: element.product_name__c,
+            product: element.products_name__c,
             vendor_name: element.vendor_name__c,
             amount: element.total_amount__c,
             status: element.status__c,
             action: (
-            <MDTypography style={{cursor:'pointer'}} onClick={()=>editUser(element.id)} component="a" color="text">
-              <Icon >more_vert</Icon>
+              <>
+            <MDTypography style={{cursor:'pointer',fontSize:"15px"}} onClick={()=>editUser(element.id)} component="a" color="text">
+              Edit
             </MDTypography>
+            <MDTypography style={{cursor:'pointer',paddingLeft:"13px",fontSize:"15px"}} onClick={()=>deleteUser(element.id)} component="a" color="text">
+            Delete
+            </MDTypography>
+            </>
           ),
         })
       })
@@ -309,7 +330,7 @@ function Purchase() {
         </Grid>
       </MDBox>
       ):(
-        <Grid item xs={8} pt={6} pb={3}>
+        <Grid item xs={12} pt={6} pb={3}>
         <Card>
           <MDBox
             mx={2}
@@ -334,7 +355,7 @@ function Purchase() {
                     </MDAlert>
                 </MDBox>
                 )}
-				<MDBox mx={4}>
+				      <MDBox mx={4}>
                   <Grid item xs={12} pb={3}>
                     <Grid container spacing={3}>
                       <Grid item xs={12} md={6} xl={6}>
@@ -346,7 +367,7 @@ function Purchase() {
                     </Grid>
                   </Grid>
                 </MDBox>
-				<MDBox mx={4}>
+				      <MDBox mx={4}>
                   <Grid item xs={12} pb={3}>
                     <Grid container spacing={3}>
                       <Grid item xs={12} md={6} xl={6}>
@@ -358,7 +379,7 @@ function Purchase() {
                     </Grid>
                   </Grid>
                 </MDBox>
-				<MDBox mx={4}>
+				      <MDBox mx={4}>
                   <Grid item xs={12} pb={3}>
                     <Grid container spacing={3}>
                       <Grid item xs={12} md={6} xl={6}>
@@ -370,7 +391,7 @@ function Purchase() {
                     </Grid>
                   </Grid>
                 </MDBox>
-				<MDBox mx={4}>
+				      <MDBox mx={4}>
                   <Grid item xs={12} pb={3}>
                     <Grid container spacing={3}>
                       <Grid item xs={12} md={6} xl={6}>
@@ -382,7 +403,7 @@ function Purchase() {
                     </Grid>
                   </Grid>
                 </MDBox>
-				<MDBox mx={4}>
+				      <MDBox mx={4}>
                   <Grid item xs={12} pb={3}>
                     <Grid container spacing={3}>
                       <Grid item xs={12} md={6} xl={6}>
@@ -405,17 +426,17 @@ function Purchase() {
 								<MenuItem value="Bihar">BIHAR</MenuItem>
 							</MDInput> 
 						</Grid>
-                      <Grid item xs={12} md={6} xl={6}>
-                        <MDInput type="text" label="Sale Refrence" value={sale_preference} onChange={(e)=>setSalePreference(e.target.value)} fullWidth />
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                </MDBox>
-				<MDBox mx={4}>
-                  <Grid item xs={12} pb={3}>
-                    <Grid container spacing={3}>
-                      <Grid item xs={12} md={6} xl={6}>
-                       	  <MDInput
+            <Grid item xs={12} md={6} xl={6}>
+              <MDInput type="text" label="Sale Refrence" value={sale_preference} onChange={(e)=>setSalePreference(e.target.value)} fullWidth />
+            </Grid>
+          </Grid>
+        </Grid>
+      </MDBox>
+    <MDBox mx={4}>
+        <Grid item xs={12} pb={3}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6} xl={6}>
+                <MDInput
 							size="large"
 							select
 							id="demo-simple-select"
@@ -448,43 +469,43 @@ function Purchase() {
                         <th className="tablehead" scope="col">Amount</th>
                     </tr>
                     </thead>
-                    <hr style={{width:"650%",marginTop:"15px",marginRight:"0",marginLeft:"35px"}}/>
+                    <hr style={{width:"740%",marginTop:"15px",marginRight:"0",marginLeft:"35px"}}/>
                     <tbody>
                     <tr>
                         <th className="tablelinetd" style={{fontSize:"17px"}} scope="row">
                         <input type="text" value={product_name} onChange={(e)=>setProductName(e.target.value)} className="tableinputbox" style={{ width:"120px"}}/>
                         </th>
-                        <td className="tablelinetd" data-title="Released">
+                        <td className="tablelinetd" style={{paddingLeft:"40px"}} data-title="Released">
                         <input type="text" value={description} onChange={(e)=>setDescription(e.target.value)} className="tableinputbox" style={{width:"140px"}}/>
                         </td>
-                        <td className="tablelinetd" data-title="Studio">
+                        <td className="tablelinetd" style={{paddingLeft:"40px"}} data-title="Studio">
                         <input type="text" value={hsn} onChange={(e)=>setHSN(e.target.value)} className="tableinputbox" style={{width:"60px"}}/>
                         </td>
-                        <td className="tablelinetd" data-title="Worldwide Gross" data-type="currency">
+                        <td className="tablelinetd" style={{paddingLeft:"40px"}} data-title="Worldwide Gross" data-type="currency">
                         <input type="text" value={rate} onChange={(e)=>setRate(e.target.value)} className="tableinputbox"/>
                         </td>
-                        <td data-title="Domestic Gross"  className="tablelinetd" data-type="currency">
+                        <td data-title="Domestic Gross" style={{paddingLeft:"40px"}} className="tablelinetd" data-type="currency">
                         <input type="text" value={quantity} onChange={(e)=>setQty(e.target.value)} className="tableinputbox"/>
                         </td>
-                        <td data-title="International Gross"  className="tablelinetd" data-type="currency">
+                        <td data-title="International Gross" style={{paddingLeft:"40px"}} className="tablelinetd" data-type="currency">
                         <input type="text" value={tax_rate} onChange={(e)=>setTaxRate(e.target.value)} className="tableinputbox"/>
                         </td>
-                        <td data-title="Budget"  className="tablelinetd" data-type="currency">
+                        <td data-title="Budget" style={{paddingLeft:"40px"}} className="tablelinetd" data-type="currency">
                         <input type="text" value={discount} onChange={(e)=>setDiscount(e.target.value)} className="tableinputbox"/>
                         </td>
-                        <td data-title="Budget"  className="tablelinetd" data-type="currency">
+                        <td data-title="Budget" style={{paddingLeft:"40px"}} className="tablelinetd" data-type="currency">
                         <input type="text" value={amount} onChange={(e)=>setAmount(e.target.value)} className="tableinputbox"/>
                         </td>
                     </tr>
                     </tbody>
-                    <hr style={{width:"650%",marginTop:"18px",marginRight:"0",marginLeft:"35px"}}/>
+                    <hr style={{width:"740%",marginTop:"18px",marginRight:"0",marginLeft:"35px"}}/>
                 </table>
-                <div className="div234">
+                <div className="div234" style={{marginLeft:"700px"}}>
                     <tr>
                         <td className="totalboxtr">
                             SUBTOTAL
                         </td>
-                        <td className="totalnumbertd" >
+                        <td style={{paddingLeft: "200px"}} >
                         <input type="text" value={subtotal} onChange={(e)=>setSubTotal(e.target.value)} style={{width:"80%",outline: "none",paddingTop:"10px"}}/>
                         </td>
                     </tr>
@@ -492,7 +513,7 @@ function Purchase() {
                         <td className="totalboxtr">
                             CGST
                         </td>
-                        <td className="totalnumbertd" >
+                        <td style={{paddingLeft: "200px"}} >
                         <input type="text" value={cgst} onChange={(e)=>setCGST(e.target.value)} style={{width:"80%",outline: "none",paddingTop:"10px"}}/>
                         </td>
                     </tr>
@@ -500,7 +521,7 @@ function Purchase() {
                         <td className="totalboxtr">
                             SGST
                         </td>
-                        <td className="totalnumbertd" >
+                        <td style={{paddingLeft: "200px"}} >
                         <input type="text" value={sgst} onChange={(e)=>setSGST(e.target.value)} style={{width:"80%",outline: "none",paddingTop:"10px"}}/>
                         </td>
                     </tr>
@@ -509,7 +530,7 @@ function Purchase() {
                         <td className="totalboxtr">
                         Total
                         </td>
-                        <td style={{paddingLeft: "180px"}} >
+                        <td style={{paddingLeft: "220px"}} >
                         <input type="text" value={total_amount} onChange={(e)=>setTotalAmount(e.target.value)} style={{width:"80%",outline: "none",paddingTop:"8px"}}/>
                         </td>
                     </tr>
