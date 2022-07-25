@@ -20,6 +20,7 @@ import "./product.css";
 
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
+import Switch from "@mui/material/Switch";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -44,6 +45,7 @@ import { userID } from "../../auth";
 const api = process.env.REACT_APP_API_URI;
 
 function Products() {
+  const [followsMe, setFollowsMe] = useState(true);
   const { columns: pColumns, rows: pRows } = projectsTableData();
   const [ isAddEnable, setAddEnable ] = useState(false);
   const [isLoginFaild, setLoginFaild] = useState(false);
@@ -70,7 +72,7 @@ function Products() {
     formdata.append('product_id', product_id);
     formdata.append('image', image);
     formdata.append('name', productname);
-    formdata.append('type', 1);
+    formdata.append('type', followsMe);
     formdata.append('category', productcategory);
     formdata.append('sku', sku);
     formdata.append('barcode', barcode);
@@ -104,7 +106,7 @@ function Products() {
     formdata.append('user_id', user_id);
     formdata.append('image', image);
     formdata.append('name', productname);
-    formdata.append('type', 1);
+    formdata.append('type', followsMe);
     formdata.append('category', productcategory);
     formdata.append('sku', sku);
     formdata.append('barcode', barcode);
@@ -137,7 +139,7 @@ function Products() {
       { Header: "product name", accessor: "productname", align: "left" },
       { Header: "type", accessor: "type", align: "center" },
       { Header: "SKU", accessor: "SKU", align: "center" },
-      { Header: "unitmeasure", accessor: "unitmeasure", align: "center" },
+      { Header: "unit", accessor: "unitmeasure", align: "center" },
       { Header: "HSN", accessor: "HSN", align: "center" },
       { Header: "Action", accessor: "action", align: "center" },
     ]
@@ -192,12 +194,17 @@ function Products() {
           productname: element.name__c,
           type: element.type__c,
           SKU: element.sku__c,
-          unitmeasure: element.measure_unit__c,
+          unitmeasure: element.mesure_unit__c,
           HSN: element.hsn_code__c,
           action: (
-            <MDTypography style={{cursor:'pointer'}} onClick={()=>editUser(element.id)} component="a" color="text">
-              <Icon >more_vert</Icon>
+            <>
+            <MDTypography style={{cursor:'pointer',fontSize:"15px"}} onClick={()=>editUser(element.id)} component="a" color="text">
+              edit
             </MDTypography>
+            <MDTypography style={{cursor:'pointer',paddingLeft:"13px",fontSize:"15px"}} component="a" color="text">
+            delete
+          </MDTypography>
+          </>
           ),
         })
       })
@@ -294,7 +301,7 @@ function Products() {
             </MDTypography>
           </MDBox>
           <MDBox pt={3}>
-            <MDBox component="form" role="form" onSubmit={handleSubmit}>
+            <MDBox component="form" role="form" onSubmit={handleSubmit} enctype="multipart/form-data">
             {isLoginFaild && (
                 <MDBox mb={2}>
                     <MDAlert color="error" dismissible>
@@ -302,6 +309,9 @@ function Products() {
                     </MDAlert>
                 </MDBox>
                 )}
+                <MDBox mt={0.5}>
+            <Switch checked={followsMe} onChange={() => setFollowsMe(!followsMe)} />
+          </MDBox>
                 <div className="Neon Neon-theme-dragdropbox">
                 <input
                   style={{
@@ -315,10 +325,9 @@ function Products() {
                     marginRight: "auto",
                     marginLeft: "auto"
                   }}
-                  name="files[]"
-                  id="filer_input2"
+                  name="fileToUpload"
+                  id="fileToUpload"
                   onChange={(e)=>setImage(e.target.value)} value={image}
-                  multiple="multiple"
                   type="file"
                 />
                 <div className="Neon-input-dragDrop">
