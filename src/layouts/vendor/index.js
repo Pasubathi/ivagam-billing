@@ -47,6 +47,7 @@ function Vendors() {
   const { columns: pColumns, rows: pRows } = projectsTableData();
   const [ isAddEnable, setAddEnable ] = useState(false);
   const [isLoginFaild, setLoginFaild] = useState(false);
+  const [isDelete, setDelete] = useState(false);
   const [user_id, setUserID] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [gst, setGst] = useState('');
@@ -147,7 +148,8 @@ function Vendors() {
       </MDTypography>
     </MDTypography>
   );
-
+  
+ 
   const editUser = async (id) =>{
       setVendorId(id);
       const obj = {
@@ -172,8 +174,28 @@ function Vendors() {
          const msg = getData.message;
        }
   }
-
-
+  const deleteVendor = async (id) =>{
+      setVendorId(id);
+	  const user = await userID();
+	  const obj = {
+        "vendor_id": id
+      }
+      const getData = await axios.post(`${api}delete_vendor`, obj).then((response) => {
+        console.log()
+        return response.data;
+      });
+       if (getData.status === 'success') {
+		   setDelete(true);
+          const msg = getData.message;
+           setErrorMsg(msg);
+	  } else {
+		 setDelete(true);
+		 const msg = getData.message;
+           setErrorMsg(msg);
+       }
+  }
+  
+  
   const generateRow = async (getData) =>{
     const row = [];
     if(getData && getData.length > 0)
@@ -185,9 +207,14 @@ function Vendors() {
           customer_name: element.name__c,
           address: element.address__c,
           action: (
-            <MDTypography style={{cursor:'pointer'}} onClick={()=>editUser(element.id)} component="a" color="text">
-              <Icon >more_vert</Icon>
-            </MDTypography>
+		  <>
+		  <MDTypography component="a" href="#" onClick={()=>editUser(element.id)} variant="caption" color="text" fontWeight="medium">
+            Edit
+          </MDTypography><br/>
+		  <MDTypography component="a" href="#" onClick={()=>deleteVendor(element.id)} variant="caption" color="text" fontWeight="medium">
+            Delete
+          </MDTypography>
+		  </>
           ),
         })
       })
@@ -195,6 +222,7 @@ function Vendors() {
     }
   }
   
+   
   const getVendors = async (user) =>{
       const obj = {
         "user_id": user
@@ -215,6 +243,11 @@ function Vendors() {
       console.error(`Error ${error}`);
     }
   }
+  
+  
+  
+  
+  
   useEffect(async ()=>{
     const user = await userID();
     if(user)
@@ -237,6 +270,13 @@ function Vendors() {
                 &nbsp;Add Vendor
               </MDButton>
             </MDBox>
+			{isDelete && (
+				<MDBox mb={2}>
+					<MDAlert color="success" dismissible>
+					  {alertContent("error")}
+					</MDAlert>
+				</MDBox>
+				)}
           <Grid item xs={12}>
             <Card>
               <MDBox

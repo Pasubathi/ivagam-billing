@@ -36,6 +36,9 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
 
+import Moment from 'moment';
+
+
 // Data
 import projectsTableData from "layouts/tables/data/projectsTableData";
 
@@ -53,7 +56,7 @@ function Purchase() {
   const [date, setDate] = useState('');
   const [gst, setGst] = useState('');
   const [delivery_date, setDeliveryDate] = useState('');
-  const [name, setName] = useState('');
+  const [vendor_name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [mobile, setMobile] = useState('');
   const [delivery_address, setDeliveryAddress] = useState('');
@@ -63,14 +66,14 @@ function Purchase() {
   const [supplyPlace, setSupplyPlace] = useState('');
   const [purchaseId, setPurchaseId] = useState(''); 
   
-  const [product, setProduct] = useState('');
-  const [description, setDescription] = useState('');
-  const [hsn, setHSN] = useState('');
-  const [rate, setRate] = useState('');
-  const [qty, setQty] = useState('');
-  const [tax, setTax] = useState('');
-  const [discount, setDiscount] = useState('');
-  const [amount, setAmount] = useState('');
+  const [product, setProduct] = useState([]);
+  const [description, setDescription] = useState([]);
+  const [hsn, setHSN] = useState([]);
+  const [rate, setRate] = useState([]);
+  const [qty, setQty] = useState([]);
+  const [tax, setTax] = useState([]);
+  const [discount, setDiscount] = useState([]);
+  const [amount, setAmount] = useState([]);
   
   const [subtotal, setSubTotal] = useState('');
   const [cgst, setCGST] = useState('');
@@ -81,6 +84,8 @@ function Purchase() {
   const [balance_due, setBalanceDue] = useState('');
   
   const [purchase_note, setPurchaseNote] = useState('');
+  
+  const [inputList, setInputList] = useState([{ firstName: "", lastName: "" }]);
   
   const current = new Date();
   const cdate = `${current.getDate()}/${current.getMonth()+1}/${current.getFullYear()}`;
@@ -93,7 +98,7 @@ function Purchase() {
       "invoice_date": date,
       "vendor_gstin": gst,
       "delivery_date": delivery_date,
-      "vendor_name": name,
+      "vendor_name": vendor_name,
       "vendor_address": address,
       "vendor_mob_no": mobile,
       "delivery_address": delivery_address,
@@ -170,7 +175,7 @@ function Purchase() {
 	    "invoice_date": date,
 	    "vendor_gstin": gst,
 	    "delivery_date": delivery_date,
-	    "vendor_name": name,
+	    "vendor_name": vendor_name,
 	    "vendor_address": address,
 	    "vendor_mob_no": mobile,
 	    "delivery_address": delivery_address,
@@ -238,6 +243,55 @@ function Purchase() {
          setErrorMsg(msg);
        }
   }
+  
+  const addProduct = async () =>{
+	  <tr>
+		<th className="tablelinetd" style={{fontSize:"17px"}} scope="row">
+		<input type="text" className="tableinputbox" value={product} onChange={(e)=>setProduct(e.target.value)} style={{ width:"120px"}}/>
+		</th>
+		<td className="tablelinetd" data-title="Released">
+		<input type="text" className="tableinputbox" value={description} onChange={(e)=>setDescription(e.target.value)} style={{width:"140px"}}/>
+		</td>
+		<td className="tablelinetd" data-title="Studio">
+		<input type="text" className="tableinputbox" value={hsn} onChange={(e)=>setHSN(e.target.value)} style={{width:"60px"}}/>
+		</td>
+		<td className="tablelinetd" data-title="Worldwide Gross" data-type="currency">
+		<input type="text" className="tableinputbox" value={rate} onChange={(e)=>setRate(e.target.value)}/>
+		</td>
+		<td data-title="Domestic Gross"  className="tablelinetd" data-type="currency">
+		<input type="text" className="tableinputbox" value={qty} onChange={(e)=>setQty(e.target.value)}/>
+		</td>
+		<td data-title="International Gross"  className="tablelinetd" data-type="currency">
+		<input type="text" className="tableinputbox" value={tax} onChange={(e)=>setTax(e.target.value)}/>
+		</td>
+		<td data-title="Budget"  className="tablelinetd" data-type="currency">
+		<input type="text" className="tableinputbox" value={discount} onChange={(e)=>setDiscount(e.target.value)}/>
+		</td>
+		<td data-title="Budget"  className="tablelinetd" data-type="currency">
+		<input type="text" className="tableinputbox" value={amount} onChange={(e)=>setAmount(e.target.value)}/>
+		</td>
+	</tr>  
+  }
+  
+  const handleInputChange = (e, index) => {
+    const { name, value } = e.target;
+    const list = [...inputList];
+    list[index][name] = value;
+    setInputList(list);
+  };
+ 
+  // handle click event of the Remove button
+  const handleRemoveClick = index => {
+    const list = [...inputList];
+    list.splice(index, 1);
+    setInputList(list);
+  };
+ 
+  // handle click event of the Add button
+  const handleAddClick = () => {
+    setInputList([...inputList, { firstName: "", lastName: "" }]);
+  };
+  
   const [ column, setColumn ] = useState(
     [
       { Header: "Date", accessor: "date", width: "10%", align: "left" },
@@ -305,7 +359,7 @@ function Purchase() {
     {
       getData.forEach((element, index) => {
         row.push({
-          date: element.date__c,
+          date: Moment(element.date__c).format('DD MMMM yyyy'),
           purchase_no: element.purchase_invoice_no__c,
           product: element.name__c,
           vendor_name: element.vendor_name__c,
@@ -394,7 +448,7 @@ function Purchase() {
         </Grid>
       </MDBox>
       ):(
-        <Grid item xs={8} pt={6} pb={3}>
+        <Grid item xs={12} pt={6} pb={3}>
         <Card>
           <MDBox
             mx={2}
@@ -447,7 +501,7 @@ function Purchase() {
                   <Grid item xs={12} pb={3}>
                     <Grid container spacing={3}>
                       <Grid item xs={12} md={6} xl={6}>
-                        <MDInput type="text" label="Vendor Name" value={name} onChange={(e)=>setName(e.target.value)} fullWidth />
+                        <MDInput type="text" label="Vendor Name" value={vendor_name} onChange={(e)=>setName(e.target.value)} fullWidth />
                       </Grid>
                       <Grid item xs={12} md={6} xl={6}>
                         <MDInput type="text" label="Vendor Address" value={address} onChange={(e)=>setAddress(e.target.value)} fullWidth />
@@ -565,9 +619,34 @@ function Purchase() {
                         <input type="text" className="tableinputbox" value={amount} onChange={(e)=>setAmount(e.target.value)}/>
                         </td>
                     </tr>
+					
                     </tbody>
                     <hr style={{width:"650%",marginTop:"18px",marginRight:"0",marginLeft:"35px"}}/>
                 </table>
+				{inputList.map((x, i) => (
+					  <div className="box" key='product-0'>
+						<input
+						  name="firstName"
+			   placeholder="Enter First Name"
+						  value={x.firstName}
+						  onChange={e => handleInputChange(e, i)}
+						/>
+						<input
+						  className="ml10"
+						  name="lastName"
+			   placeholder="Enter Last Name"
+						  value={x.lastName}
+						  onChange={e => handleInputChange(e, i)}
+						/>
+						<div className="btn-box">
+						{inputList.length !== 1 && (<button type="button"
+							className="mr10"
+							onClick={() => handleRemoveClick(i)}>Remove</button>)}
+						  {inputList.length - 1 === i && (<button type="button" onClick={handleAddClick}>Add</button>)}
+						</div>
+					  </div>
+				  ))}
+				
                 <div className="div234">
                     <tr>
                         <td className="totalboxtr">
@@ -643,11 +722,11 @@ function Purchase() {
                         </MDButton>
                       </Grid>
                       <Grid item xs={12} md={6} xl={6}>
-                        {name && purchaseId ?(
+                        {vendor_name && purchaseId ?(
                         <MDButton onClick={handleUpdate} variant="gradient" color="info" fullWidth>
                           Update
                         </MDButton>
-                        ):name && (
+                        ):vendor_name && (
                           <MDButton onClick={handleSubmit} variant="gradient" color="info" fullWidth>
                             Create
                           </MDButton>
