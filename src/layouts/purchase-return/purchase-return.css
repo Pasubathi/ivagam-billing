@@ -9,7 +9,7 @@
     top: calc(50% - 1em);
 }
 .div234 {
-    width: 300px;
+    width: 500px;
     height: 157px;
     margin-top: 40px;
     margin-left: 783px;
@@ -23,7 +23,7 @@
     padding-top: 10px;
   }
   .totalnumbertd{
-    padding-left: 150px;
+    padding-left: 500px;
   }
   .entertextinput{
     margin-top: 48px;
@@ -40,7 +40,7 @@
   }
   .tablehead{
     padding-left:35px;
-    font-size:17px;
+    font-size:50px;
   }
   .tablelinetd{
     padding-left:35px;
