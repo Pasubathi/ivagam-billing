@@ -217,19 +217,39 @@ function Purchase() {
 	  const list = [...inputList];
       list[index][product] = data.id;
 	  list[index][description] = data.description__c;
-	  list[index][hsn] = data.hsn_code__c;
+	  list[index][hsn]  = data.hsn_code__c;
 	  list[index][rate] = data.sales_rate__c;
-	  list[index][tax] = data.tax__c;
+	  list[index][tax]  = data.tax__c;
       setInputList(list);
+  }
+
+  const productCalculation = (index) =>{
+	  const list = [...inputList];
+	  const data = list[index];
+	  const proData = productList.find(x => x.id === data.product);
+    const qty    = 'qty';
+    const amount = "amount";
+	  const tax    = "tax";
+	  const rate   = "rate";
+    const quantity = data[qty] && data[qty] > 0?data[qty]:0;
+    const vat      = data[tax] && data[tax] > 0?data[tax]/100:0;
+    const price    = data[rate] && data[rate] > 0?data[rate]:0;
+    const total    = price*quantity;
+    const tax_rate = vat*total;
+    setSubTotal(total);
+    setCGST(tax_rate);
+    setSGST(tax_rate);
+    setTotalAmount(total+tax_rate);
+    setBalanceDue(total+tax_rate)
+    list[index][amount] = total;
   }
   
   const handleQtyUpdate = (e, index) =>{
 	  const { name, value } = e.target;
-	  const amount = "amount";
-	  const data = inputList[index];
 	  const list = [...inputList];
-      list[index][amount] = data.rate * data.qty;
-	  setInputList(list); 
+    list[index][name] = value;
+	  setInputList(list);
+    productCalculation(index);
   }
   
   const handleInputChange = (e, index) => {
@@ -237,6 +257,7 @@ function Purchase() {
     const list = [...inputList];
     list[index][name] = value;
     setInputList(list);
+    productCalculation(index);
   };
  
   // handle click event of the Remove button
@@ -639,8 +660,7 @@ function Purchase() {
                        <MDInput
 						  name="amount"
 			    		  value={x.amount?x.amount-x.discount:''} className="tableinputbox"
-						  onChange={e => handleInputChange(e, i)}
-						/></td>
+						  onChange={e => handleInputChange(e, i)} readOnly /></td>
 						<td>
 						{inputList.length !== 1 && (<button type="button"
 							className="mr10"
@@ -661,7 +681,7 @@ function Purchase() {
                             SUBTOTAL
                         </td>
                         <td className="totalnumbertd">
-                            <input type="text" value={subtotal} onChange={(e)=>setSubTotal(e.target.value)} style={{width:"80%",outline: "none",paddingTop:"10px"}}/>
+                            <input type="text" value={subtotal} onChange={(e)=>setSubTotal(e.target.value)} style={{width:"80%",outline: "none",paddingTop:"10px"}} readOnly/>
                         </td>
                     </tr>
                     <tr>
@@ -669,7 +689,7 @@ function Purchase() {
                             CGST
                         </td>
                         <td className="totalnumbertd">
-                            <input type="text" value={cgst} onChange={(e)=>setCGST(e.target.value)} style={{width:"80%",outline: "none",paddingTop:"10px"}}/>
+                            <input type="text" value={cgst} onChange={(e)=>setCGST(e.target.value)} style={{width:"80%",outline: "none",paddingTop:"10px"}} readOnly/>
                         </td>
                     </tr>
                     <tr>
@@ -677,7 +697,7 @@ function Purchase() {
                             SGST
                         </td>
                         <td className="totalnumbertd" >
-                            <input type="text" value={sgst} onChange={(e)=>setSGST(e.target.value)} style={{width:"80%",outline: "none",paddingTop:"10px"}}/>
+                            <input type="text" value={sgst} onChange={(e)=>setSGST(e.target.value)} style={{width:"80%",outline: "none",paddingTop:"10px"}} readOnly/>
                         </td>
                     </tr>
 					<hr style={{width:"100%"}}/>
@@ -695,7 +715,7 @@ function Purchase() {
                         Total Amount
                         </td>
                         <td className="totalnumbertd" >
-                            <input type="text" value={total_amount} onChange={(e)=>setTotalAmount(e.target.value)} style={{width:"80%",outline: "none",paddingTop:"10px"}}/>
+                            <input type="text" value={total_amount} style={{width:"80%",outline: "none",paddingTop:"10px"}} readOnly/>
                         </td>
                     </tr>
 					<hr style={{width:"100%"}}/>
@@ -713,7 +733,7 @@ function Purchase() {
                         Balance Due
                         </td>
                         <td className="totalnumbertd" >
-                            <input type="text" value={balance_due} onChange={(e)=>setBalanceDue(e.target.value)} style={{width:"80%",outline: "none",paddingTop:"10px"}}/>
+                            <input type="text" value={balance_due} style={{width:"80%",outline: "none",paddingTop:"10px"}}/>
                         </td>
                     </tr>
                 </div>
