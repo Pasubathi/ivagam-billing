@@ -65,16 +65,7 @@ function Purchase() {
   const [delivery_to, setDeliveryTo] = useState('');
   const [supplyPlace, setSupplyPlace] = useState('');
   const [purchaseId, setPurchaseId] = useState(''); 
-  
-  const [product, setProduct] = useState([]);
-  const [description, setDescription] = useState([]);
-  const [hsn, setHSN] = useState([]);
-  const [rate, setRate] = useState([]);
-  const [qty, setQty] = useState([]);
-  const [tax, setTax] = useState([]);
-  const [discount, setDiscount] = useState([]);
-  const [amount, setAmount] = useState([]);
-  
+   
   const [subtotal, setSubTotal] = useState('');
   const [cgst, setCGST] = useState('');
   const [sgst, setSGST] = useState('');
@@ -83,12 +74,15 @@ function Purchase() {
   const [amount_paid, setAmountPaid] = useState('');
   const [balance_due, setBalanceDue] = useState('');
   
+  const [productList, setProductList] = useState('');
+  const [productDetail, setProductDetail] = useState('');
+  
   const [purchase_note, setPurchaseNote] = useState('');
   
-  const [inputList, setInputList] = useState([{ firstName: "", lastName: "" }]);
+  const [inputList, setInputList] = useState([{ product: "", description: "", hsn: "", rate: "", qty: "", tax: "", discount: "", amount: "" }]);
   
   const current = new Date();
-  const cdate = `${current.getDate()}/${current.getMonth()+1}/${current.getFullYear()}`;
+  const cdate = `${current.getFullYear()}-${current.getMonth()+1}-${current.getDate()}`;
 
   const handleUpdate = async () =>{
     const obj = {
@@ -115,15 +109,7 @@ function Purchase() {
 	  "total_amount": total_amount,
 	  "purchase_note": purchase_note,
 	  "status": 1,
-	  "products": [ 
-                    {"product_name": product,
-                    "description" : description,
-                    "hsn": hsn,
-                    "rate":rate,
-                    "quantity":qty,
-                    "tax_rate":tax,
-                    "discount": discount,
-                    "amount": amount,} ]
+	  "products": inputList
     }
     const getData = await axios.post(`${api}update_purchase`, obj).then((response) => {
       console.log();
@@ -152,14 +138,6 @@ function Purchase() {
 	   setShippingCharge('');
 	   setAmountPaid('');
 	   setBalanceDue('');
-	   setProduct('');
-	   setDescription('');
-	   setHSN('');
-	   setRate('');
-	   setQty('');
-	   setTax('');
-	   setDiscount('');
-	   setAmount('');
        setErrorMsg('');
      } else {
        const msg = getData.message;
@@ -192,15 +170,7 @@ function Purchase() {
 		"total_amount": total_amount,
 		"purchase_note": purchase_note,
 		"status": 1,
-		"products": [ 
-                    {"product_name": product,
-                    "description" : description,
-                    "hsn": hsn,
-                    "rate":rate,
-                    "quantity":qty,
-                    "tax_rate":tax,
-                    "discount": discount,
-                    "amount": amount,} ]
+		"products": inputList
       }
       const getData = await axios.post(`${api}add_purchase`, obj).then((response) => {
         console.log();
@@ -228,14 +198,6 @@ function Purchase() {
 		   setShippingCharge('');
 		   setAmountPaid('');
 		   setBalanceDue('');
-		   setProduct('');
-		   setDescription('');
-		   setHSN('');
-		   setRate('');
-		   setQty('');
-		   setTax('');
-		   setDiscount('');
-		   setAmount('');
            setErrorMsg('');
        } else {
          const msg = getData.message;
@@ -244,33 +206,30 @@ function Purchase() {
        }
   }
   
-  const addProduct = async () =>{
-	  <tr>
-		<th className="tablelinetd" style={{fontSize:"17px"}} scope="row">
-		<input type="text" className="tableinputbox" value={product} onChange={(e)=>setProduct(e.target.value)} style={{ width:"120px"}}/>
-		</th>
-		<td className="tablelinetd" data-title="Released">
-		<input type="text" className="tableinputbox" value={description} onChange={(e)=>setDescription(e.target.value)} style={{width:"140px"}}/>
-		</td>
-		<td className="tablelinetd" data-title="Studio">
-		<input type="text" className="tableinputbox" value={hsn} onChange={(e)=>setHSN(e.target.value)} style={{width:"60px"}}/>
-		</td>
-		<td className="tablelinetd" data-title="Worldwide Gross" data-type="currency">
-		<input type="text" className="tableinputbox" value={rate} onChange={(e)=>setRate(e.target.value)}/>
-		</td>
-		<td data-title="Domestic Gross"  className="tablelinetd" data-type="currency">
-		<input type="text" className="tableinputbox" value={qty} onChange={(e)=>setQty(e.target.value)}/>
-		</td>
-		<td data-title="International Gross"  className="tablelinetd" data-type="currency">
-		<input type="text" className="tableinputbox" value={tax} onChange={(e)=>setTax(e.target.value)}/>
-		</td>
-		<td data-title="Budget"  className="tablelinetd" data-type="currency">
-		<input type="text" className="tableinputbox" value={discount} onChange={(e)=>setDiscount(e.target.value)}/>
-		</td>
-		<td data-title="Budget"  className="tablelinetd" data-type="currency">
-		<input type="text" className="tableinputbox" value={amount} onChange={(e)=>setAmount(e.target.value)}/>
-		</td>
-	</tr>  
+  const handleProductDetail = (e, index) =>{
+	  const { name, value } = e.target;
+	  const product = "product";
+	  const description = "description";
+	  const hsn = "hsn";
+	  const rate = "rate";
+	  const tax = "tax";
+	  const data = productList.find(x => x.id === value);
+	  const list = [...inputList];
+      list[index][product] = data.id;
+	  list[index][description] = data.description__c;
+	  list[index][hsn] = data.hsn_code__c;
+	  list[index][rate] = data.sales_rate__c;
+	  list[index][tax] = data.tax__c;
+      setInputList(list);
+  }
+  
+  const handleQtyUpdate = (e, index) =>{
+	  const { name, value } = e.target;
+	  const amount = "amount";
+	  const data = inputList[index];
+	  const list = [...inputList];
+      list[index][amount] = data.rate * data.qty;
+	  setInputList(list); 
   }
   
   const handleInputChange = (e, index) => {
@@ -289,7 +248,7 @@ function Purchase() {
  
   // handle click event of the Add button
   const handleAddClick = () => {
-    setInputList([...inputList, { firstName: "", lastName: "" }]);
+    setInputList([...inputList, { product: "", description: "", hsn: "", rate: "", qty: "", tax: "", discount: "", amount: "" }]);
   };
   
   const [ column, setColumn ] = useState(
@@ -312,7 +271,7 @@ function Purchase() {
       </MDTypography>
     </MDTypography>
   );
-
+  
   const editUser = async (id) =>{
       setPurchaseId(id);
       const obj = {
@@ -396,12 +355,35 @@ function Purchase() {
       console.error(`Error ${error}`);
     }
   }
+  
+  const getProduct = async (user) =>{
+      const obj = {
+        "user_id": user
+      }
+    try {
+      const getData = await axios.post(`${api}products`, obj).then((response) => {
+        console.log();
+         return response.data;
+       });
+        if (getData.status === 'success') {
+		   const row = [];
+           const getRows = getData.data;
+		   setProductList(getRows);
+        } else {
+          const msg = getData.message;
+        }
+        
+    } catch (error) {
+      console.error(`Error ${error}`);
+    }
+  }
   useEffect(async ()=>{
     const user = await userID();
     if(user)
     {
       setUserID(user);
       getPurchase(user);
+	  getProduct(user);
     }else{
       window.location = "/sign-in"
     }
@@ -591,61 +573,87 @@ function Purchase() {
                         <th className="tablehead" scope="col">Amount</th>
                     </tr>
                     </thead>
-                    <hr style={{width:"650%",marginTop:"15px",marginRight:"0",marginLeft:"35px"}}/>
+                    <hr style={{width:"700%",marginTop:"15px",marginRight:"0",marginLeft:"35px"}}/>
                     <tbody>
+					{inputList.map((x, i) => (
                     <tr>
-                        <th className="tablelinetd" style={{fontSize:"17px"}} scope="row">
-                        <input type="text" className="tableinputbox" value={product} onChange={(e)=>setProduct(e.target.value)} style={{ width:"120px"}}/>
-                        </th>
-                        <td className="tablelinetd" data-title="Released">
-                        <input type="text" className="tableinputbox" value={description} onChange={(e)=>setDescription(e.target.value)} style={{width:"140px"}}/>
-                        </td>
-                        <td className="tablelinetd" data-title="Studio">
-                        <input type="text" className="tableinputbox" value={hsn} onChange={(e)=>setHSN(e.target.value)} style={{width:"60px"}}/>
-                        </td>
-                        <td className="tablelinetd" data-title="Worldwide Gross" data-type="currency">
-                        <input type="text" className="tableinputbox" value={rate} onChange={(e)=>setRate(e.target.value)}/>
-                        </td>
+                        <th className="tablelinetd" style={{fontSize:"17px",paddingLeft:"40px"}} scope="row">
+                       
+					   <MDInput
+                          size="large"
+                          select
+                          id="demo-simple-select"
+                          className="tableinputbox"
+                          style={{ width:"120px"}}
+                          InputProps={{
+                            classes: { root: "select-input-styles" },
+                          }}
+						  name="product"
+                          value={x.product}
+						  onChange={e => handleProductDetail(e, i)}
+                          fullWidth
+                          >
+						  {productList.map((y, j) => (
+                          <MenuItem value={y.id} key={y.id} >{y.name__c}</MenuItem>
+                           ))}
+                        </MDInput>
+						
+						</th>
+						 <td className="tablelinetd" style={{paddingLeft:"40px"}} data-title="Released">
+                         <MDInput
+						  name="description"
+			     		  value={x.description} className="tableinputbox"
+						  onChange={e => handleInputChange(e, i)}
+						/></td>
+                        <td className="tablelinetd" style={{paddingLeft:"40px"}} data-title="Studio">
+                        <MDInput
+						  name="hsn"
+			    		  value={x.hsn} className="tableinputbox"
+						  onChange={e => handleInputChange(e, i)}
+						/></td>
+                        <td className="tablelinetd" style={{paddingLeft:"40px"}} data-title="Worldwide Gross" data-type="currency">
+                        <MDInput
+						  name="rate"
+			    		  value={x.rate} className="tableinputbox"
+						  onChange={e => handleInputChange(e, i)}
+						/></td>
                         <td data-title="Domestic Gross"  className="tablelinetd" data-type="currency">
-                        <input type="text" className="tableinputbox" value={qty} onChange={(e)=>setQty(e.target.value)}/>
-                        </td>
+                       <MDInput
+						  name="qty"
+			   			  value={x.qty} className="tableinputbox"
+						  onChange={e => handleQtyUpdate(e, i)}
+						/></td>
                         <td data-title="International Gross"  className="tablelinetd" data-type="currency">
-                        <input type="text" className="tableinputbox" value={tax} onChange={(e)=>setTax(e.target.value)}/>
-                        </td>
-                        <td data-title="Budget"  className="tablelinetd" data-type="currency">
-                        <input type="text" className="tableinputbox" value={discount} onChange={(e)=>setDiscount(e.target.value)}/>
-                        </td>
-                        <td data-title="Budget"  className="tablelinetd" data-type="currency">
-                        <input type="text" className="tableinputbox" value={amount} onChange={(e)=>setAmount(e.target.value)}/>
-                        </td>
-                    </tr>
-					
-                    </tbody>
-                    <hr style={{width:"650%",marginTop:"18px",marginRight:"0",marginLeft:"35px"}}/>
-                </table>
-				{inputList.map((x, i) => (
-					  <div className="box" key='product-0'>
-						<input
-						  name="firstName"
-			   placeholder="Enter First Name"
-						  value={x.firstName}
+                        <MDInput
+						  name="tax"
+			   			  value={x.tax} className="tableinputbox"
 						  onChange={e => handleInputChange(e, i)}
-						/>
-						<input
-						  className="ml10"
-						  name="lastName"
-			   placeholder="Enter Last Name"
-						  value={x.lastName}
+						/></td>
+                        <td data-title="Budget"  className="tablelinetd" data-type="currency">
+                        <MDInput
+						  name="discount"
+			    		  value={x.discount} className="tableinputbox"
 						  onChange={e => handleInputChange(e, i)}
-						/>
-						<div className="btn-box">
+						/></td>
+                        <td data-title="Budget"  className="tablelinetd" data-type="currency">
+                       <MDInput
+						  name="amount"
+			    		  value={x.amount?x.amount-x.discount:''} className="tableinputbox"
+						  onChange={e => handleInputChange(e, i)}
+						/></td>
+						<td>
 						{inputList.length !== 1 && (<button type="button"
 							className="mr10"
 							onClick={() => handleRemoveClick(i)}>Remove</button>)}
-						  {inputList.length - 1 === i && (<button type="button" onClick={handleAddClick}>Add</button>)}
-						</div>
-					  </div>
-				  ))}
+						</td>
+                    </tr>
+					))} 
+                    </tbody>
+                    <hr style={{width:"700%",marginTop:"18px",marginRight:"0",marginLeft:"35px"}}/>
+                </table>
+				<MDButton onClick={handleAddClick} variant="gradient" color="info" >
+                          Add Product
+                        </MDButton>
 				
                 <div className="div234">
                     <tr>
