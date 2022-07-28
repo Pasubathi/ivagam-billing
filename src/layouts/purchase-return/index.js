@@ -75,7 +75,8 @@ function Purchase() {
   const [tax_rate, setTaxRate] = useState('');
   const [discount, setDiscount] = useState('');
   const [amount, setAmount] = useState('');
- 
+  const [inputList, setInputList] = useState([{ product: "", description: "", hsn: "", rate: "", qty: "", tax: "", discount: "", amount: "" }]);
+  
   const handleUpdate = async () =>{
     const obj = {
       "user_id": user_id,
@@ -159,6 +160,26 @@ function Purchase() {
          setErrorMsg(msg);
        }
   }
+
+  const handleInputChange = (e, index) => {
+    const { name, value } = e.target;
+    const list = [...inputList];
+    list[index][name] = value;
+    setInputList(list);
+  };
+ 
+  // handle click event of the Remove button
+  const handleRemoveClick = index => {
+    const list = [...inputList];
+    list.splice(index, 1);
+    setInputList(list);
+  };
+ 
+  // handle click event of the Add button
+  const handleAddClick = () => {
+    setInputList([...inputList, { product: "", description: "", hsn: "", rate: "", qty: "", tax: "", discount: "", amount: "" }]);
+  };
+
   const [ column, setColumn ] = useState(
     [
       { Header: "Date", accessor: "date", width: "10%", align: "left" },
@@ -469,36 +490,61 @@ function Purchase() {
                         <th className="tablehead" scope="col">Amount</th>
                     </tr>
                     </thead>
-                    <hr style={{width:"740%",marginTop:"15px",marginRight:"0",marginLeft:"35px"}}/>
+                    <hr style={{width:"660%",marginTop:"15px",marginRight:"0",marginLeft:"35px"}}/>
                     <tbody>
+                    {inputList.map((x, i) => (
                     <tr>
                         <th className="tablelinetd" style={{fontSize:"17px"}} scope="row">
-                        <input type="text" value={product_name} onChange={(e)=>setProductName(e.target.value)} className="tableinputbox" style={{ width:"120px"}}/>
+                        <MDInput
+                          size="large"
+                          select
+                          id="demo-simple-select"
+                          className="tableinputbox"
+                          style={{ width:"120px"}}
+                          InputProps={{
+                            classes: { root: "select-input-styles" },
+                          }}
+                          value={x.product_name}
+                          onChange={e => handleInputChange(e, i)}
+                          fullWidth
+                          >
+                          <MenuItem value="Andaman">ANDAMAN AND NICOBAR ISLANDS</MenuItem>
+                          <MenuItem value="Andhra Pradesh"> ANDHRA PRADESH</MenuItem>
+                        </MDInput> 
                         </th>
                         <td className="tablelinetd" style={{paddingLeft:"40px"}} data-title="Released">
-                        <input type="text" value={description} onChange={(e)=>setDescription(e.target.value)} className="tableinputbox" style={{width:"140px"}}/>
+                        <MDInput value={x.description} onChange={e => handleInputChange(e, i)} className="tableinputbox" style={{width:"140px"}}/>
                         </td>
                         <td className="tablelinetd" style={{paddingLeft:"40px"}} data-title="Studio">
-                        <input type="text" value={hsn} onChange={(e)=>setHSN(e.target.value)} className="tableinputbox" style={{width:"60px"}}/>
+                        <MDInput value={x.hsn} onChange={e => handleInputChange(e, i)} className="tableinputbox" style={{width:"60px"}}/>
                         </td>
                         <td className="tablelinetd" style={{paddingLeft:"40px"}} data-title="Worldwide Gross" data-type="currency">
-                        <input type="text" value={rate} onChange={(e)=>setRate(e.target.value)} className="tableinputbox"/>
+                        <MDInput value={x.rate} onChange={e => handleInputChange(e, i)} className="tableinputbox"/>
                         </td>
                         <td data-title="Domestic Gross" style={{paddingLeft:"40px"}} className="tablelinetd" data-type="currency">
-                        <input type="text" value={quantity} onChange={(e)=>setQty(e.target.value)} className="tableinputbox"/>
+                        <MDInput value={x.quantity} onChange={e => handleInputChange(e, i)} className="tableinputbox"/>
                         </td>
                         <td data-title="International Gross" style={{paddingLeft:"40px"}} className="tablelinetd" data-type="currency">
-                        <input type="text" value={tax_rate} onChange={(e)=>setTaxRate(e.target.value)} className="tableinputbox"/>
+                        <MDInput value={x.tax_rate} onChange={e => handleInputChange(e, i)} className="tableinputbox"/>
                         </td>
                         <td data-title="Budget" style={{paddingLeft:"40px"}} className="tablelinetd" data-type="currency">
-                        <input type="text" value={discount} onChange={(e)=>setDiscount(e.target.value)} className="tableinputbox"/>
+                        <MDInput value={x.discount} onChange={e => handleInputChange(e, i)} className="tableinputbox"/>
                         </td>
                         <td data-title="Budget" style={{paddingLeft:"40px"}} className="tablelinetd" data-type="currency">
-                        <input type="text" value={amount} onChange={(e)=>setAmount(e.target.value)} className="tableinputbox"/>
+                        <MDInput value={x.amount} onChange={e => handleInputChange(e, i)} className="tableinputbox"/>
+                        </td>
+                          <td>
+                          {inputList.length !== 1 && (<button type="button"
+                            className="mr10"
+                            onClick={() => handleRemoveClick(i)}><Icon>delete</Icon>&nbsp;delete</button>)}
                         </td>
                     </tr>
+                     ))}
                     </tbody>
-                    <hr style={{width:"740%",marginTop:"18px",marginRight:"0",marginLeft:"35px"}}/>
+                    <hr style={{width:"660%",marginTop:"18px",marginRight:"0",marginLeft:"35px"}}/>
+                  <MDButton onClick={handleAddClick} style={{marginTop:"25px",marginLeft:"35px"}} variant="gradient" color="info" fullWidth>
+                    Add Product
+                  </MDButton>
                 </table>
                 <div className="div234" style={{marginLeft:"700px"}}>
                     <tr>
