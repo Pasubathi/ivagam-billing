@@ -150,9 +150,9 @@ const routes = [
   {
     type: "collapse",
     name: "purchase Order",
-    key: "purchase",
+    key: "PurchaseOrder",
     icon: <Icon fontSize="small">person</Icon>,
-    route: "/purchase",
+    route: "/PurchaseOrder",
     component: <PurchaseOrder />,
   },
 ];

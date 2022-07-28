@@ -10,7 +10,7 @@
 }
 .div234 {
     width: 35%;
-    height: 293px;
+    height: 293px !important;
     margin-top: 40px;
     margin-left: 600px;
     font-weight: bold;
@@ -43,6 +43,6 @@
     font-size:17px;
   }
   .tablelinetd{
-    padding-left:35px;
+    padding-left:40px;
     padding-top:17px;
   }
