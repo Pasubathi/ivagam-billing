@@ -205,6 +205,31 @@ function Purchase() {
          setErrorMsg(msg);
        }
   }
+
+  const productCalculation = (index) =>{
+	  const list = [...inputList];
+	  const data = list[index];
+	  const proData = productList.find(x => x.id === data.product);
+    const qty    = 'qty';
+    const amount = "amount";
+	  const tax    = "tax";
+	  const rate   = "rate";
+	  const discount = "discount";
+    const quantity = data[qty] && data[qty] > 0?data[qty]:0;
+    const vat      = data[tax] && data[tax] > 0?data[tax]/100:0;
+    const price    = data[rate] && data[rate] > 0?data[rate]:0;
+    const discount_price    = data[discount] && data[discount] > 0?data[discount]:0;
+    const grandTotal = price*quantity;
+    const actPrice = grandTotal > discount_price?grandTotal - discount_price:0;
+    const total    = actPrice;
+    const tax_rate = vat*total;
+    setSubTotal(total);
+    setCGST(tax_rate);
+    setSGST(tax_rate);
+    setTotalAmount(total+tax_rate);
+    setBalanceDue(total+tax_rate)
+    list[index][amount] = total;
+  }
   
   const handleProductDetail = (e, index) =>{
 	  const { name, value } = e.target;
@@ -221,27 +246,7 @@ function Purchase() {
 	  list[index][rate] = data.sales_rate__c;
 	  list[index][tax]  = data.tax__c;
       setInputList(list);
-  }
-
-  const productCalculation = (index) =>{
-	  const list = [...inputList];
-	  const data = list[index];
-	  const proData = productList.find(x => x.id === data.product);
-    const qty    = 'qty';
-    const amount = "amount";
-	  const tax    = "tax";
-	  const rate   = "rate";
-    const quantity = data[qty] && data[qty] > 0?data[qty]:0;
-    const vat      = data[tax] && data[tax] > 0?data[tax]/100:0;
-    const price    = data[rate] && data[rate] > 0?data[rate]:0;
-    const total    = price*quantity;
-    const tax_rate = vat*total;
-    setSubTotal(total);
-    setCGST(tax_rate);
-    setSGST(tax_rate);
-    setTotalAmount(total+tax_rate);
-    setBalanceDue(total+tax_rate)
-    list[index][amount] = total;
+      productCalculation(index);
   }
   
   const handleQtyUpdate = (e, index) =>{
@@ -659,7 +664,7 @@ function Purchase() {
                         <td data-title="Budget"  className="tablelinetd" data-type="currency">
                        <MDInput
 						  name="amount"
-			    		  value={x.amount?x.amount-x.discount:''} className="tableinputbox"
+			    		  value={x.amount} className="tableinputbox"
 						  onChange={e => handleInputChange(e, i)} readOnly /></td>
 						<td>
 						{inputList.length !== 1 && (<button type="button"
