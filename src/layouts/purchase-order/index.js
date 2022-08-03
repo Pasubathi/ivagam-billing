@@ -38,6 +38,7 @@ import DataTable from "examples/Tables/DataTable";
 
 // Data
 import projectsTableData from "layouts/tables/data/projectsTableData";
+import Moment from 'moment';
 
 import { userID } from "../../auth";
 
@@ -63,20 +64,13 @@ function PurchaseOrder() {
   const [delivery_to, setDeliveryTo] = useState('');
   const [place, setPlace] = useState('');
   const [tax_type, setTaxtype] = useState('');
-  const [product_name, setProductName] = useState('');
-  const [description, setDescription] = useState('');
-  const [hsn, setHSN] = useState('');
-  const [rate, setRate] = useState('');
-  const [quantity, setQty] = useState('');
-  const [tax_rate, setTaxRate] = useState('');
-  const [discount, setDiscount] = useState('');
-  const [amount, setAmount] = useState('');
+
   const [subtotal, setSubTotal] = useState('');
   const [cgst, setCGST] = useState('');
   const [sgst, setSGST] = useState('');
   const [total_amount, setTotalAmount] = useState('');
   const [purchase_note, setPurchaseNote] = useState('');
-  
+  const [productList, setProductList] = useState('');
   const [inputList, setInputList] = useState([{ product_name: "",
                                               description : "",
                                               hsn: "",
@@ -107,15 +101,8 @@ function PurchaseOrder() {
       "sgst": sgst,
       "total_amount": total_amount,
       "purchase_note":purchase_note,
-      "products":([ 
-                    {"product_name": product_name,
-                    "description" : description,
-                    "hsn": hsn,
-                    "rate":rate,
-                    "quantity":quantity,
-                    "tax_rate":tax_rate,
-                    "discount": discount,
-                    "amount": amount,}])
+      "status": 1,
+	   	"products": inputList
     }
     const getData = await axios.post(`${api}update_prepurchase`, obj).then((response) => {
       console.log();
@@ -135,14 +122,6 @@ function PurchaseOrder() {
        setMobileNumber('');
        setVendorAddress('');
        setDeliveryTo('');
-       setProductName('');
-       setDescription('');
-       setHSN('');
-       setRate('');
-       setQty('');
-       setTaxRate('');
-       setDiscount('');
-       setAmount('');
        setSubTotal('');
        setCGST('');
        setSGST('');
@@ -173,14 +152,6 @@ function PurchaseOrder() {
     setPlace('');
     setTaxtype('');
     setVendor_gst('');
-    setProductName('');
-    setDescription('');
-    setHSN('');
-    setRate('');
-    setQty('');
-    setRate('');
-    setDiscount('');
-    setAmount('');
     setSubTotal('');
     setCGST('');
     setSGST('');
@@ -209,15 +180,8 @@ function PurchaseOrder() {
         "sgst": sgst,
         "total_amount": total_amount,
         "purchase_note":purchase_note,
-        "products":([ 
-                    {"product_name": product_name,
-                    "description" : description,
-                    "hsn": hsn,
-                    "rate":rate,
-                    "quantity":quantity,
-                    "tax_rate":tax_rate,
-                    "discount": discount,
-                    "amount": amount}])
+        "status": 1,
+		    "products": inputList
          }
       const getData = await axios.post(`${api}add_prepurchase`, obj).then((response) => {
         console.log();
@@ -236,15 +200,6 @@ function PurchaseOrder() {
          setPurchaseOrderDate('');
          setVendorAddress('');
          setDeliveryTo('');
-         setProductName('');
-         setPlace('');
-         setDescription('');
-         setHSN('');
-         setRate('');
-         setQty('');
-         setTaxRate('');
-         setDiscount('');
-         setAmount('');
          setSubTotal('');
          setCGST('');
          setSGST('');
@@ -257,11 +212,63 @@ function PurchaseOrder() {
          setErrorMsg(msg);
        }
   }
+
+  const productCalculation = (index) =>{
+	  const list = [...inputList];
+	  const data = list[index];
+	  const proData = productList.find(x => x.id === data.products);
+    const quantity    = 'quantity';
+    const amount = "amount";
+	  const tax    = "tax_rate";
+	  const rate   = "rate";
+	  const discount = "discount";
+    const qty = data[quantity] && data[quantity] > 0?data[quantity]:0;
+    const vat      = data[tax] && data[tax] > 0?data[tax]/100:0;
+    const price    = data[rate] && data[rate] > 0?data[rate]:0;
+    const discount_price    = data[discount] && data[discount] > 0?data[discount]:0;
+    const grandTotal = price*qty;
+    const actPrice = grandTotal > discount_price?grandTotal - discount_price:0;
+    const total    = actPrice;
+    const tax_rate = vat*total;
+    setSubTotal(total);
+    setCGST(tax_rate);
+    setSGST(tax_rate);
+    setTotalAmount(total+tax_rate);
+    list[index][amount] = total;
+  }
+
+  const handleProductDetail = (e, index) =>{
+	  const { name, value } = e.target;
+	  const product_name = "product_name";
+	  const description = "description";
+	  const hsn = "hsn";
+	  const rate = "rate";
+	  const tax_rate = "tax_rate";
+	  const data = productList.find(x => x.id === value);
+	  const list = [...inputList];
+      list[index][product_name] = data.id;
+	  list[index][description] = data.sales_description__c;
+	  list[index][hsn]  = data.hsn_code__c;
+	  list[index][rate] = data.sales_rate__c;
+	  list[index][tax_rate]  = data.tax__c;
+      setInputList(list);
+      productCalculation(index);
+  }
+
+  const handleQtyUpdate = (e, index) =>{
+	  const { name, value } = e.target;
+	  const list = [...inputList];
+    list[index][name] = value;
+	  setInputList(list);
+    productCalculation(index);
+  }
+
   const handleInputChange = (e, index) => {
     const { name, value } = e.target;
     const list = [...inputList];
     list[index][name] = value;
     setInputList(list);
+    productCalculation(index);
   };
  
   // handle click event of the Remove button
@@ -273,7 +280,7 @@ function PurchaseOrder() {
  
   // handle click event of the Add button
   const handleAddClick = () => {
-    setInputList([...inputList, { product: "", description: "", hsn: "", rate: "", qty: "", tax: "", discount: "", amount: "" }]);
+    setInputList([...inputList, { product_name: "", description: "", hsn: "", rate: "", quantity: "", tax_rate: "", discount: "", amount: "" }]);
   };
 
   const [ column, setColumn ] = useState(
@@ -296,8 +303,7 @@ function PurchaseOrder() {
       </MDTypography>
     </MDTypography>
   );
-  const [ products, setProducts ] = useState([]);
-
+ 
    const editUser = async (id) =>{
       setPurchaseId(id);
       const obj = {
@@ -309,9 +315,6 @@ function PurchaseOrder() {
       });
        if (getData.status === 'success') {
           const getRows = getData.data;
-          const get_products = getRows && getRows.products;
-           setProducts (get_products);
-
           setAddEnable(true);
           setOrder_no(getRows && getRows.purchase_order_no__c?getRows.purchase_order_no__c:'');
           setVendor_gst(getRows && getRows.vendor_gstin__c?getRows.vendor_gstin__c:'');
@@ -325,6 +328,7 @@ function PurchaseOrder() {
           setMobileNumber(getRows && getRows.vendor_mob_no__c?getRows.vendor_mob_no__c:'');
           setVendorAddress(getRows && getRows.vendor_address__c?getRows.vendor_address__c:'');
           setDeliveryTo(getRows && getRows.delivery_to__c?getRows.delivery_to__c:'');
+
           setSubTotal(getRows && getRows.subtotal__c?getRows.subtotal__c:'');
           setCGST(getRows && getRows.cgst__c?getRows.cgst__c:'');
           setSGST(getRows && getRows.sgst__c?getRows.sgst__c:'');
@@ -337,26 +341,6 @@ function PurchaseOrder() {
        }  
   }
 
-  const getProduct = async (get_products) =>{
-    const row = [];
-    if(get_products && get_products.length > 0)
-    {
-      get_products.forEach((e) => {
-        row.push({
-          product_name: e.product_name__c,
-          description: e.description_c,
-          hsn: e.hsn__c,
-          rate: e.rate__c,
-          quantity:e.quantity__c,
-          tax_rate: e.tax_rate__c,
-          discount: e.discount__c,
-          amount: e.amount__c,
-        })
-      })
-      setProducts(row);
-    }
-  }
-
   const generateRow = async (getData) =>{
     const row = [];
     if(getData && getData.length > 0)
@@ -364,7 +348,7 @@ function PurchaseOrder() {
       getData.forEach((element, index) => {
         row.push({
           s_no: index+1,
-          purchase_date: element.date__c,
+          purchase_date: Moment(element.date__c).format('DD MMMM yyyy'),
           vendor_name: element.vendor_name__c,
           amount: element.total_amount__c,
           purchase_no:element.purchase_order_no__c,
@@ -384,6 +368,29 @@ function PurchaseOrder() {
       setCustomers(row);
     }
   }
+
+  const getProduct = async (user) =>{
+    const obj = {
+      "user_id": user
+    }
+  try {
+    const getData = await axios.post(`${api}products`, obj).then((response) => {
+      console.log();
+      return response.data;
+    });
+      if (getData.status === 'success') {
+    const row = [];
+        const getRows = getData.data;
+      
+    setProductList(getRows);
+      } else {
+        const msg = getData.message;
+      }
+      
+  } catch (error) {
+    console.error(`Error ${error}`);
+  }
+}
   
   const getCustomers = async (user) =>{
       const obj = {
@@ -412,10 +419,13 @@ function PurchaseOrder() {
     {
       setUserID(user);
       getCustomers(user);
+      getProduct(user);
     }else{
       window.location = "/sign-in"
     }
   },[isAddEnable])
+
+ 
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -576,34 +586,36 @@ function PurchaseOrder() {
                                 InputProps={{
                                   classes: { root: "select-input-styles" },
                                 }}
+                                 name="product_name"
                                 value={x.product_name}
-                                onChange={e => handleInputChange(e, i)}
+                                onChange={e => handleProductDetail(e, i)}
                                 fullWidth
                                 >
-                                <MenuItem value="Andaman">ANDAMAN </MenuItem>
-                                <MenuItem value="Andhra Pradesh"> ANDHRA PRADESH </MenuItem>
+                                {productList.map((y) => (
+                                  <MenuItem value={y.id} key={y.id}>{y.name__c}</MenuItem>
+                                ))}
                               </MDInput> 
                               </th>
                               <td className="tablelinetd" style={{paddingLeft:"25px"}} data-title="Released">
-                              <MDInput type="text" value={x.description} onChange={e => handleInputChange(e, i)} className="tableinputbox" style={{width:"140px"}}/>
+                              <MDInput type="text" name="description" value={x.description} onChange={e => handleInputChange(e, i)} className="tableinputbox" style={{width:"140px"}}/>
                               </td>
                               <td className="tablelinetd" style={{paddingLeft:"25px"}} data-title="Studio">
-                              <MDInput type="text" value={x.hsn} onChange={e => handleInputChange(e, i)} className="tableinputbox" style={{width:"60px"}}/>
+                              <MDInput type="text" name="hsn" value={x.hsn} onChange={e => handleInputChange(e, i)} className="tableinputbox" style={{width:"60px"}}/>
                               </td>
                               <td className="tablelinetd" style={{paddingLeft:"25px"}} data-title="Worldwide Gross" data-type="currency">
-                              <MDInput type="text" value={x.rate} onChange={e => handleInputChange(e, i)} className="tableinputbox"/>
+                              <MDInput type="text" name="rate" value={x.rate} onChange={e => handleInputChange(e, i)} className="tableinputbox"/>
                               </td>
                               <td data-title="Domestic Gross" style={{paddingLeft:"25px"}} className="tablelinetd" data-type="currency">
-                              <MDInput type="text" value={x.quantity} onChange={e => handleInputChange(e, i)} className="tableinputbox"/>
+                              <MDInput type="text" name="quantity" value={x.quantity} onChange={e => handleQtyUpdate(e, i)} className="tableinputbox"/>
                               </td>
                               <td data-title="International Gross" style={{paddingLeft:"25px"}} className="tablelinetd" data-type="currency">
-                              <MDInput type="text" value={x.tax_rate} onChange={e => handleInputChange(e, i)} className="tableinputbox"/>
+                              <MDInput type="text" name="tax_rate" value={x.tax_rate} onChange={e => handleInputChange(e, i)} className="tableinputbox"/>
                               </td>
                               <td data-title="Budget" style={{paddingLeft:"25px"}} className="tablelinetd" data-type="currency">
-                              <MDInput type="text" value={x.discount} onChange={e => handleInputChange(e, i)} className="tableinputbox"/>
+                              <MDInput type="text" name="discount" value={x.discount} onChange={e => handleInputChange(e, i)} className="tableinputbox"/>
                               </td>
                               <td data-title="Budget" style={{paddingLeft:"25px"}} className="tablelinetd" data-type="currency">
-                              <MDInput type="text" value={x.amount} onChange={e => handleInputChange(e, i)} className="tableinputbox"/>
+                              <MDInput type="text" name="amount" value={x.amount} onChange={e => handleInputChange(e, i)} className="tableinputbox"/>
                               </td>
                                 <td>
                                 {inputList.length !== 1 && (
@@ -622,42 +634,26 @@ function PurchaseOrder() {
                     &nbsp;More Product
                   </MDButton>
                 </MDBox>
-                <div className="div234">
-                    <tr>
-                        <td className="totalboxtr">
-                            SUBTOTAL
-                        </td>
-                        <td className="totalnumbertd" >
-                        <input type="text" value={subtotal} onChange={(e)=>setSubTotal(e.target.value)} style={{width:"80%",outline: "none",paddingTop:"8px"}}/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td className="totalboxtr">
-                            CGST
-                        </td>
-                        <td className="totalnumbertd" >
-                        <input type="text" value={cgst} onChange={(e)=>setCGST(e.target.value)} style={{width:"80%",outline: "none",paddingTop:"10px"}}/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td className="totalboxtr">
-                            SGST
-                        </td>
-                        <td className="totalnumbertd" >
-                        <input type="text" value={sgst} onChange={(e)=>setSGST(e.target.value)} style={{width:"80%",outline: "none",paddingTop:"10px"}}/>
-                        </td>
-                    </tr>
-                    <hr style={{width:"100%"}}/>
-                    <tr>
-                        <td className="totalboxtr">
-                        Total
-                        </td>
-                        <td style={{paddingLeft:"182px"}} >
-                        <input type="text" value={total_amount} onChange={(e)=>setTotalAmount(e.target.value)} style={{width:"80%",outline: "none",paddingTop:"10px"}}/>
-                        </td>
+                <div className="totalboxtr">
+                      <tr>
+                        <td>SUBTOTAL:</td>
+                        <td style={{paddingLeft:"40px", paddingTop:"10px"}}><MDInput type="text" value={subtotal} onChange={(e)=>setSubTotal(e.target.value)}/></td>
+                      </tr>
+                      <tr>
+                        <td>CGST :</td>
+                        <td style={{paddingLeft:"40px", paddingTop:"10px"}}><MDInput type="text" value={cgst} onChange={(e)=>setCGST(e.target.value)} /></td>
+                      </tr>
+                      <tr>
+                        <td>SGST :</td>
+                        <td style={{paddingLeft:"40px", paddingTop:"10px"}}><MDInput type="text" value={sgst} onChange={(e)=>setSGST(e.target.value)} /></td>
+                      </tr>
+                      <hr style={{width:"100%" , marginTop:"15px"}}/>
+                      <tr>
+                        <td>Total :</td>
+                        <td style={{paddingLeft:"80px", paddingTop:"10px"}}><MDInput type="text" value={total_amount} onChange={(e)=>setTotalAmount(e.target.value)} /></td>
                     </tr>
                 </div>
-                    <textarea type="text" value={purchase_note} onChange={(e)=>setPurchaseNote(e.target.value)} className="entertextinput" placeholder=" Enter Text" fullWidth />
+                    <textarea type="text" style={{border:"1px solid lightgray" , Color:"lightgray"}} value={purchase_note} onChange={(e)=>setPurchaseNote(e.target.value)} className="entertextinput" placeholder=" Enter Text" fullWidth />
                 </div>                
                 <MDBox mt={4} mb={1}  mx={4}>
                   <Grid item xs={12} pb={3}>
