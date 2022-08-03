@@ -67,14 +67,9 @@ function Purchase() {
   const [sgst, setSGST] = useState('');
   const [total_amount, setTotalAmount] = useState('');
   const [purchase_note, setPurchaseNote] = useState('');
-  const [product_name, setProductName] = useState('');
-  const [description, setDescription] = useState('');
-  const [hsn, setHSN] = useState('');
-  const [rate, setRate] = useState('');
-  const [quantity, setQty] = useState('');
-  const [tax_rate, setTaxRate] = useState('');
-  const [discount, setDiscount] = useState('');
-  const [amount, setAmount] = useState('');
+  const [balance_due, setBalanceDue] = useState('');
+  const [productList, setProductList] = useState('');
+
   const [inputList, setInputList] = useState([{ product: "", description: "", hsn: "", rate: "", qty: "", tax: "", discount: "", amount: "" }]);
   
   const handleUpdate = async () =>{
@@ -89,15 +84,16 @@ function Purchase() {
       "place_of_supply": place_of_supply,
       "vendor_name": vendor_name,
       "vendor_address": vendor_address,
-	  "vendor_mob_no": vendor_mob_no,
-	  "sale_preference": sale_preference,
-	  "tax_type": tax_type,
-	  "subtotal": subtotal,
+      "vendor_mob_no": vendor_mob_no,
+      "sale_preference": sale_preference,
+      "tax_type": tax_type,
+      "subtotal": subtotal,
       "cgst": cgst,
-	  "sgst": sgst,
-	  "total_amount": total_amount,
-	  "purchase_note": purchase_note,
-      "status": 1
+      "sgst": sgst,
+      "total_amount": total_amount,
+      "purchase_note": purchase_note,
+      "status": 1,
+      "products": inputList
     }
     const getData = await axios.post(`${api}update_debit_note`, obj).then((response) => {
       console.log();
@@ -135,15 +131,7 @@ function Purchase() {
         "total_amount": total_amount,
         "purchase_note": purchase_note,
         "status": 1,
-        "products":[ 
-            {"product_name": product_name,
-            "description": description,
-            "hsn": hsn,
-            "rate": rate,
-            "quantity": quantity,
-            "tax_rate": tax_rate,
-            "discount": discount,
-            "amount": amount} ]
+        "products": inputList
  }
       const getData = await axios.post(`${api}add_debit_note`, obj).then((response) => {
         console.log();
@@ -161,11 +149,63 @@ function Purchase() {
        }
   }
 
+  const productCalculation = (index) =>{
+	  const list = [...inputList];
+	  const data = list[index];
+	  const proData = productList.find(x => x.id === data.product);
+    const qty    = 'qty';
+    const amount = "amount";
+	  const tax    = "tax";
+	  const rate   = "rate";
+	  const discount = "discount";
+    const quantity = data[qty] && data[qty] > 0?data[qty]:0;
+    const vat      = data[tax] && data[tax] > 0?data[tax]/100:0;
+    const price    = data[rate] && data[rate] > 0?data[rate]:0;
+    const discount_price    = data[discount] && data[discount] > 0?data[discount]:0;
+    const grandTotal = price*quantity;
+    const actPrice = grandTotal > discount_price?grandTotal - discount_price:0;
+    const total    = actPrice;
+    const tax_rate = vat*total;
+    setSubTotal(total);
+    setCGST(tax_rate);
+    setSGST(tax_rate);
+    setTotalAmount(total+tax_rate);
+    setBalanceDue(total+tax_rate)
+    list[index][amount] = total;
+  }
+  
+  const handleProductDetail = (e, index) =>{
+	  const { name, value } = e.target;
+	  const product = "product";
+	  const description = "description";
+	  const hsn = "hsn";
+	  const rate = "rate";
+	  const tax = "tax";
+	  const data = productList.find(x => x.id === value);
+	  const list = [...inputList];
+      list[index][product] = data.id;
+	  list[index][description] = data.description__c;
+	  list[index][hsn]  = data.hsn_code__c;
+	  list[index][rate] = data.sales_rate__c;
+	  list[index][tax]  = data.tax__c;
+      setInputList(list);
+      productCalculation(index);
+  }
+  
+  const handleQtyUpdate = (e, index) =>{
+	  const { name, value } = e.target;
+	  const list = [...inputList];
+    list[index][name] = value;
+	  setInputList(list);
+    productCalculation(index);
+  }
+  
   const handleInputChange = (e, index) => {
     const { name, value } = e.target;
     const list = [...inputList];
     list[index][name] = value;
     setInputList(list);
+    productCalculation(index);
   };
  
   // handle click event of the Remove button
@@ -183,11 +223,9 @@ function Purchase() {
   const [ column, setColumn ] = useState(
     [
       { Header: "Date", accessor: "date", width: "10%", align: "left" },
-	    { Header: "Purchase no.", accessor: "purchase_no", align: "center" },
-      { Header: "Product", accessor: "product", align: "left" },
-      { Header: "Vendor name", accessor: "vendor_name", align: "center" },
+	    { Header: "debit note no.", accessor: "debit_note_no", align: "center" },
+	    { Header: "party name", accessor: "vendor_name", align: "center" },
 	    { Header: "Amount", accessor: "amount", align: "center" },
-	    { Header: "Status", accessor: "status", align: "center" },
       { Header: "action", accessor: "action", align: "center" },
     ]
   )
@@ -256,13 +294,13 @@ function Purchase() {
     if(getData && getData.length > 0)
     {
       getData.forEach((element, index) => {
+        const options = { year: "numeric",month: "long", day: "numeric"}
+        const data = new Date(element.date__c).toLocaleDateString(undefined, options)
         row.push({
-            date: element.date__c,
-            purchase_no: element.purchase_invoice_no__c,
-            product: element.products_name__c,
-            vendor_name: element.vendor_name__c,
+            date: data,
+            debit_note_no: element.debit_note_no__c,
             amount: element.total_amount__c,
-            status: element.status__c,
+            vendor_name: element.vendor_name__c,
             action: (
               <>
             <MDTypography style={{cursor:'pointer',fontSize:"15px"}} onClick={()=>editUser(element.id)} component="a" color="text">
@@ -279,6 +317,29 @@ function Purchase() {
     }
   }
   
+    const getProduct = async (user) =>{
+      const obj = {
+        "user_id": user
+      }
+    try {
+      const getData = await axios.post(`${api}products`, obj).then((response) => {
+        console.log();
+        return response.data;
+      });
+        if (getData.status === 'success') {
+      const row = [];
+          const getRows = getData.data;
+        
+      setProductList(getRows);
+        } else {
+          const msg = getData.message;
+        }
+        
+    } catch (error) {
+      console.error(`Error ${error}`);
+    }
+  }
+
   const getPurchase = async (user) =>{
       const obj = {
         "user_id": user
@@ -305,6 +366,7 @@ function Purchase() {
     {
       setUserID(user);
       getPurchase(user);
+      getProduct(user);
     }else{
       window.location = "/sign-in"
     }
@@ -504,35 +566,58 @@ function Purchase() {
                           InputProps={{
                             classes: { root: "select-input-styles" },
                           }}
-                          value={x.product_name}
-                          onChange={e => handleInputChange(e, i)}
+						               name="product"
+                          value={x.product}
+                          onChange={e => handleProductDetail(e, i)}
                           fullWidth
                           >
-                          <MenuItem value="Andaman">ANDAMAN AND NICOBAR ISLANDS</MenuItem>
-                          <MenuItem value="Andhra Pradesh"> ANDHRA PRADESH</MenuItem>
+						             {productList.map((y) => (
+                          <MenuItem value={y.id} key={y.id}>{y.name__c}</MenuItem>
+                           ))}
                         </MDInput> 
                         </th>
                         <td className="tablelinetd" style={{paddingLeft:"40px"}} data-title="Released">
-                        <MDInput value={x.description} onChange={e => handleInputChange(e, i)} className="tableinputbox" style={{width:"140px"}}/>
-                        </td>
+                        <MDInput
+                          name="description"
+                            value={x.description} className="tableinputbox"
+                          onChange={e => handleInputChange(e, i)}
+                        /></td>
                         <td className="tablelinetd" style={{paddingLeft:"40px"}} data-title="Studio">
-                        <MDInput value={x.hsn} onChange={e => handleInputChange(e, i)} className="tableinputbox" style={{width:"60px"}}/>
-                        </td>
+                        <MDInput
+                          name="hsn"
+                            value={x.hsn} className="tableinputbox"
+                          onChange={e => handleInputChange(e, i)}
+                        /></td>
                         <td className="tablelinetd" style={{paddingLeft:"40px"}} data-title="Worldwide Gross" data-type="currency">
-                        <MDInput value={x.rate} onChange={e => handleInputChange(e, i)} className="tableinputbox"/>
-                        </td>
+                        <MDInput
+                          name="rate"
+                            value={x.rate} className="tableinputbox"
+                          onChange={e => handleInputChange(e, i)}
+                        /></td>
                         <td data-title="Domestic Gross" style={{paddingLeft:"40px"}} className="tablelinetd" data-type="currency">
-                        <MDInput value={x.quantity} onChange={e => handleInputChange(e, i)} className="tableinputbox"/>
-                        </td>
+                        <MDInput
+                          name="qty"
+                            value={x.qty} className="tableinputbox"
+                          onChange={e => handleQtyUpdate(e, i)}
+                        /></td>
                         <td data-title="International Gross" style={{paddingLeft:"40px"}} className="tablelinetd" data-type="currency">
-                        <MDInput value={x.tax_rate} onChange={e => handleInputChange(e, i)} className="tableinputbox"/>
-                        </td>
+                        <MDInput
+                          name="tax"
+                            value={x.tax} className="tableinputbox"
+                          onChange={e => handleInputChange(e, i)}
+                        /></td>
                         <td data-title="Budget" style={{paddingLeft:"40px"}} className="tablelinetd" data-type="currency">
-                        <MDInput value={x.discount} onChange={e => handleInputChange(e, i)} className="tableinputbox"/>
-                        </td>
+                        <MDInput
+                          name="discount"
+                            value={x.discount} className="tableinputbox"
+                          onChange={e => handleInputChange(e, i)}
+                        /></td>
                         <td data-title="Budget" style={{paddingLeft:"40px"}} className="tablelinetd" data-type="currency">
-                        <MDInput value={x.amount} onChange={e => handleInputChange(e, i)} className="tableinputbox"/>
-                        </td>
+                        <MDInput
+                          name="amount"
+                            value={x.amount} className="tableinputbox"
+                          onChange={e => handleInputChange(e, i)}
+                          readOnly /></td>
                           <td>
                           {inputList.length !== 1 && (<button type="button"
                             className="mr10"
