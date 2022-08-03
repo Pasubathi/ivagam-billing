@@ -8,22 +8,22 @@
     height: 2em;
     top: calc(50% - 1em);
 }
-.div234 {
-    width: 35%;
-    height: 157px;
-    margin-top: 20px;
-    margin-left: 630px;
-    font-weight: bold;
-    border-radius: 2%;
-    font-size: 16px;
-    border: 1px solid rgb(73, 70, 70);
-  }
+.tableinputbox{
+  padding-top:12px;
+  width:90px;
+  height:47px;
+  border-radius: 7%;
+}
   .totalboxtr{
-    padding-left: 20px;
-    padding-top: 10px;
-  }
-  .totalnumbertd{
-    padding-left: 140px;
+    float: right;
+    padding: 10px 20px 20px 20px;
+    margin-right: 50px;
+    margin-top: -34px;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bolder;
+    border: 1px solid lightgray ;
+    border-radius: 7%;
   }
   .entertextinput{
     margin-top: 28px;
@@ -32,12 +32,7 @@
     margin-left: 45px;
     border-radius: 3px;
   }
-  .tableinputbox{
-    padding-top:12px;
-    width:90px;
-    height:37px;
-    border-radius: 7%;
-  }
+
   .tablehead{
     padding-left:15px;
     font-size:15px;
