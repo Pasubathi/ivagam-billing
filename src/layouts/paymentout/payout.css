@@ -8,3 +8,22 @@
     height: 2em;
     top: calc(50% - 1em);
 }
+.inputWithButton {
+    position: relative;
+  }
+  
+  .inputWithButton input{
+      width: 70%;
+      padding-right: 160px;
+  }
+  
+  .inputWithButton button {
+    position: absolute;
+    height: 40px;
+    top:1.5px;
+    border-radius: 5px;
+    margin-right: 2px;
+    width: 10%;
+    right: 0;
+  }
+ 

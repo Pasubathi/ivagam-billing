@@ -42,7 +42,6 @@ import { userID } from "../../auth";
 
 const api = process.env.REACT_APP_API_URI;
 
-
 function payout() {
 
   const { columns: pColumns, rows: pRows } = projectsTableData();
@@ -112,7 +111,7 @@ function payout() {
          setErrorMsg(msg);
        }
   }
-  
+
   const alertContent = () => (
     <MDTypography variant="body2" color="white">
       <MDTypography component="a" href="#" variant="body2" fontWeight="medium" color="white">
@@ -120,8 +119,48 @@ function payout() {
       </MDTypography>
     </MDTypography>
   );
+const getCustomer = async (user) =>{
+    const obj = {
+      "user_id": user
+    }
+  try {
+    const getData = await axios.post(`${api}customers`, obj).then((response) => {
+      console.log();
+      return response.data;
+    });
+    if (getData.status === 'success') {
+      const row = [];
+          const getRows = getData.data;
+          console.log(getRows);
+        } else {
+          const msg = getData.message;
+        }
+      }catch (error) {
+        console.error(`Error ${error}`);
+      }
+}
+const getVendor = async (user) =>{
+  const obj = {
+    "user_id": user
+  }
+try {
+  const getData = await axios.post(`${api}vendors`, obj).then((response) => {
+    console.log();
+    return response.data;
+   });
+   if (getData.status === 'success') {
+    const row = [];
+        const getRows = getData.data;
+        console.log(getRows);
+      } else {
+        const msg = getData.message;
+      }
+    }catch (error) {
+      console.error(`Error ${error}`);
+    }
+}
 
-  const getProfile = async (user) =>{
+ const getProfile = async (user) =>{
       const obj = {
         "user_id": user
       }
@@ -146,6 +185,8 @@ function payout() {
     {
       setUserID(user);
       getProfile(user);
+      getVendor(user);
+      getCustomer(user);
     }else{
       window.location = "/sign-in"
     }
@@ -187,11 +228,12 @@ function payout() {
                  style={{marginLeft:"30px"}}/> Resived 
               </MDBox> 
               <MDBox mb={2} mx={4}>
-                <MDInput type="date"  onChange={(e)=>setDate(e.target.value)}  value={payment_date} fullWidth />
+                <MDInput type="date"  onChange={(e)=>setDate(e.target.value)}  value={payment_date} fullWidth /> 
               </MDBox>
-              <MDBox mb={2}  mx={4}>
-                <MDInput type="text"  label="Name" onChange={(e)=>setName(e.target.value)} value={name} fullWidth required
-                 />
+              <MDBox mb={2}  mx={4} className="inputWithButton">
+                <MDInput type="text"  label="Name" onChange={(e)=>setName(e.target.value)} value={name} fullWidth required/>
+                 <MDButton  type="button" color="info" className="inputWithButton" onClick={getVendor}>Vendor</MDButton>
+                 <MDButton type="button" color="info" className="inputWithButton" onClick={getCustomer} style={{marginRight:"9.6%"}}>Customer</MDButton>
               </MDBox>
               <MDBox mb={2}  mx={4}>
                 <MDInput type="text" label="Mobile" onChange={(e)=>setMobile(e.target.value)} value={mobile_no} fullWidth />

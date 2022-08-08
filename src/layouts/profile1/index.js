@@ -36,9 +36,10 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
-
+import ImageUploading from "react-images-uploading";
 // Data
 import projectsTableData from "layouts/tables/data/projectsTableData";
+
 
 import { userID } from "../../auth";
 
@@ -52,6 +53,7 @@ function profile1() {
   const [user_id, setUserID] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [gst, setGst] = useState('');
+
   const [company_name, setCompanyName] = useState('');
   const [address, setAddress] = useState('');
   const [pincode, setPincode] = useState('');
@@ -66,26 +68,34 @@ function profile1() {
   const [license_no, setLicenseNO] = useState('');
   const [license_title, setLicenseTitle] = useState('');
   const [gst_composite, setFollowsMe] = useState(true);
-
-  const handleUpdate = async () =>{
-    const obj = {
-      "profile_id": profileId,
-      "gst_no": gst,
-      "company_name": company_name,
-      "email": email,
-      "address": address,
-      "pincode":pincode,
-      "gst_composite":gst_composite,
-      "mobile": mobile,
-      "entity_type": entity,
-      "nature_business": nature_business,
-      "cin_no":cin_no,
-      "pan_no":pan_no,
-      "website":website,
-      "licence_title": license_no,
-      "licence_number": license_title
-    }
-    const getData = await axios.post(`${api}update_profile`, obj).then((response) => {
+  const [images, setImages] = useState('');
+    const maxNumber = 69;
+    const onChange = (imageList, addUpdateIndex) => {
+      // data for submit
+      console.log(imageList, addUpdateIndex);
+      setImages(imageList);
+  }
+  const handleUpdate = async (event) =>{
+   event.preventDefault();
+    const formData = new FormData();
+    formData.append('profile_id', profileId);
+    formData.append('user_id', user_id);
+    formData.append('image', images);
+    formData.append('gst_no', gst);
+    formData.append('company_name', company_name);
+    formData.append('email', email);
+    formData.append('pincode', pincode);
+    formData.append('gst_composite', gst_composite);
+    formData.append('address', address);
+    formData.append('mobile', mobile);
+    formData.append('entity_type', entity);
+    formData.append('nature_business', nature_business);
+    formData.append('cin_no', cin_no);
+    formData.append('pan_no', pan_no);
+    formData.append('website', website);
+    formData.append('licence_title', license_title);
+    formData.append('licence_number', license_no);
+    const getData = await axios.post(`${api}update_profile`, formData).then((response) => {
       console.log();
       return response.data;
     });
@@ -121,6 +131,7 @@ function profile1() {
     setLoginFaild(false);
     setProfileId('');
     setGst('');
+    setImages('');
     setCompanyName('');
     setEmail('');
     setPincode('');
@@ -136,30 +147,32 @@ function profile1() {
     setErrorMsg('');
     setEntity('');
   }
-  const handleSubmit = async () =>{
+  const handleSubmit = async (event) =>{
+    event.preventDefault();
+    const formData = new FormData();
+    formData.append('user_id', user_id);
+    formData.append('image', images);
+    formData.append('gst_no', gst);
+    formData.append('company_name', company_name);
+    formData.append('email', email);
+    formData.append('pincode', pincode);
+    formData.append('gst_composite', gst_composite);
+    formData.append('address', address);
+    formData.append('mobile', mobile);
+    formData.append('entity_type', entity);
+    formData.append('nature_business', nature_business);
+    formData.append('cin_no', cin_no);
+    formData.append('pan_no', pan_no);
+    formData.append('website', website);
+    formData.append('licence_title', license_title);
+    formData.append('licence_number', license_no);
 
-      const obj = {
-        "user_id": user_id,
-        "gst_no": gst,
-        "company_name": company_name,
-        "email": email,
-        "pincode":pincode,
-        "gst_composite":gst_composite,
-        "address": address,
-        "mobile": mobile,
-        "entity_type": entity,
-        "nature_business": nature_business,
-        "cin_no":cin_no,
-        "pan_no":pan_no,
-        "website":website,
-        "licence_title": license_no,
-        "licence_number": license_title,
-      }
-      const getData = await axios.post(`${api}add_profile`, obj).then((response) => {
+      const getData = await axios.post(`${api}add_profile`, formData).then((response) => {
         console.log();
         return response.data;
       });
       console.log();
+
        if (getData.status === 'success') {
          setAddEnable(false);
          setLoginFaild(false);
@@ -187,6 +200,7 @@ function profile1() {
   const [ column, setColumn ] = useState(
     [
       { Header: "s.no", accessor: "s_no", width: "10%", align: "left" },
+      { Header: "profile", accessor: "profile", align: "left" },
       { Header: "gstin", accessor: "gstin", align: "left" },
       { Header: "company name", accessor: "company_name", align: "center" },
       { Header: "address", accessor: "address", align: "center" },
@@ -217,6 +231,7 @@ function profile1() {
       return response.data;
     });
   }
+  
 
   const editUser = async (id) =>{
       setProfileId(id);
@@ -230,6 +245,7 @@ function profile1() {
        if (getData.status === 'success') {
           const getRows = getData.data;
           setAddEnable(true);
+          setImages(getRows && getRows.image_url__c?getRows.image_url__c:'');
           setGst(getRows && getRows.gstin_c?getRows.gstin_c:'');
           setCompanyName(getRows && getRows.compant_name__c?getRows.compant_name__c:'');
           setPincode(getRows && getRows.pincode__c?getRows.pincode__c:'');
@@ -256,6 +272,7 @@ function profile1() {
       getData.forEach((element, index) => {
         row.push({
           s_no: index+1,
+          profile: element.image_url__c,
           gstin: element.gstin_c,
           company_name: element.compant_name__c,
           address: element.address__c,
@@ -295,6 +312,7 @@ function profile1() {
       console.error(`Error ${error}`);
     }
   }
+
   useEffect(async ()=>{
     const user = await userID();
     if(user)
@@ -313,7 +331,7 @@ function profile1() {
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
             <MDBox pt={2} px={2} sx={{ ml: 5 }} display="flex" justifyContent="space-between" alignItems="center">
-              <MDButton onClick={()=>setAddEnable(true)} mt={10} variant="gradient" color="info">
+              <MDButton onClick={()=>setAddEnable(true)} mt={10} variant="gradient" color="dark">
                 <Icon sx={{ fontWeight: "bold" }}>add</Icon>
                 &nbsp;add Profile
               </MDButton>
@@ -380,6 +398,51 @@ function profile1() {
                     </MDAlert>
                 </MDBox>
                 )}
+            
+                <MDBox mb={2} mx={4}>
+                    <div className="App">
+                      <ImageUploading
+                        single
+                        value={images}
+                        onChange={onChange}
+                        maxNumber={maxNumber}
+                        dataURLKey="data_url"
+                        acceptType={["jpg","png"]}
+                      >
+                        {({
+                          imageList,
+                          onImageUpload,
+                          onImageUpdate,
+                          onImageRemove,
+                          isDragging,
+                          dragProps
+                        }) => (
+                          // write your building UI
+                          <div className="upload__image-wrapper">
+                            <MDButton type="button"
+                              style={isDragging ? { color: "red" } : null}
+                              onClick={onImageUpload}
+                              {...dragProps}
+                              color="dark"
+                            >
+                              Add your profile
+                            </MDButton>
+                            &nbsp;
+                    
+                            {imageList.map((image, index) => (
+                              <div className="image-item">
+                                <img src={image.data_url} alt="" height="100" name="image" value={images} onChange={(e)=>setImages(e.target.value)} width="100"/>
+                                <div className="image-item__btn-wrapper">
+                                  <MDButton type="button" color="success" onClick={() => onImageUpdate(index)}>Update</MDButton>
+                                  <MDButton type="button" color="error" onClick={() => onImageRemove(index)}>Remove</MDButton>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </ImageUploading>
+                    </div>
+                </MDBox>
                 <MDBox mb={2} mx={4}>
                   <MDInput type="text" onChange={(e)=>setGst(e.target.value)} label="GST Number" value={gst} fullWidth />
                 </MDBox>

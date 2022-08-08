@@ -141,6 +141,7 @@ const routes = [
     component: <Payout />,
    },
    {
+    type: "collapse",
     name: "expense",
     key: "expense",
     icon: <Icon fontSize="small">assignment</Icon>,
