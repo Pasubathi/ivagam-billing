@@ -17,6 +17,7 @@ Coded by www.creative-tim.com
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./profile.css";
+import {useNavigate} from 'react-router-dom';
 
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
@@ -39,6 +40,8 @@ import DataTable from "examples/Tables/DataTable";
 import ImageUploading from "react-images-uploading";
 // Data
 import projectsTableData from "layouts/tables/data/projectsTableData";
+
+import { useMaterialUIController } from "context";
 
 
 import { userID } from "../../auth";
@@ -68,6 +71,7 @@ function profile1() {
   const [license_no, setLicenseNO] = useState('');
   const [license_title, setLicenseTitle] = useState('');
   const [gst_composite, setFollowsMe] = useState(true);
+  const navigate = useNavigate();
   const [images, setImages] = useState('');
     const maxNumber = 69;
     const onChange = (imageList, addUpdateIndex) => {
@@ -80,7 +84,7 @@ function profile1() {
     const formData = new FormData();
     formData.append('profile_id', profileId);
     formData.append('user_id', user_id);
-    formData.append('image', images);
+    formData.append('image', images[0].file);
     formData.append('gst_no', gst);
     formData.append('company_name', company_name);
     formData.append('email', email);
@@ -151,7 +155,7 @@ function profile1() {
     event.preventDefault();
     const formData = new FormData();
     formData.append('user_id', user_id);
-    formData.append('image', images);
+    formData.append('image', images[0].file);
     formData.append('gst_no', gst);
     formData.append('company_name', company_name);
     formData.append('email', email);
@@ -224,15 +228,19 @@ function profile1() {
     const obj = {
       "profile_id": id
     }
-    const getData = await axios.post(`${api}`, obj).then((response) => {
+    const getData = await axios.post(`${api}remove_profile`, obj).then((response) => {
       console.log()
-      const msg = getData.message;
-      setDeleteFaild(msg);
       return response.data;
     });
+    if (getData.status === 'success') {
+      const getRows = getData.data;
+      window.location.reload(false);
+      navigate('/profile1', {replace: true});
+    } else {
+      const msg = getData.message;
+    }
   }
   
-
   const editUser = async (id) =>{
       setProfileId(id);
       const obj = {
@@ -265,6 +273,9 @@ function profile1() {
        }
   }
 
+  const [controller] = useMaterialUIController();
+  const { darkMode } = controller;
+
   const generateRow = async (getData) =>{
     const row = [];
     if(getData && getData.length > 0)
@@ -277,13 +288,15 @@ function profile1() {
           company_name: element.compant_name__c,
           address: element.address__c,
           action: (
-           <MDBox> 
-            <MDTypography style={{cursor:'pointer'}} onClick={()=>editUser(element.id)} component="a" color="text">
-              <Icon>edit</Icon>
-            </MDTypography>
-            <MDTypography style={{cursor:'pointer' , paddingLeft:'10px'}} onClick={()=>deleteUser(element.id)} component="a" color="text">
-              <Icon>delete</Icon>
-            </MDTypography>
+          <MDBox display="flex" alignItems="center" mt={{ xs: 2, sm: 0 }} ml={{ xs: -1.5, sm: 0 }}>
+             <MDBox mr={1}>
+              <MDButton variant="text" color="error" onClick={()=>deleteUser(element.id)} component="a" >
+                <Icon>delete</Icon>&nbsp;delete
+              </MDButton>
+            </MDBox>
+            <MDButton variant="text" color={darkMode ? "white" : "dark"} onClick={()=>editUser(element.id)} component="a">
+              <Icon>edit</Icon>&nbsp;edit
+            </MDButton>
           </MDBox>  
           ),
         })

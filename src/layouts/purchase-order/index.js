@@ -17,6 +17,7 @@ Coded by www.creative-tim.com
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./customer.css";
+import {useNavigate} from 'react-router-dom';
 
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
@@ -73,6 +74,7 @@ function PurchaseOrder() {
   const [total_amount, setTotalAmount] = useState('');
   const [purchase_note, setPurchaseNote] = useState('');
   const [productList, setProductList] = useState('');
+  const navigate = useNavigate();
   const [inputList, setInputList] = useState([{ product_name: "",
                                               description : "",
                                               hsn: "",
@@ -315,14 +317,19 @@ function PurchaseOrder() {
     setPurchaseId(id);
     alert("Are you sure you want to delete this Order?");
     const obj = {
-      "pre_purchase_id": id
+      "purchase_id": id
     }
-    const getData = await axios.post(`${api}`, obj).then((response) => {
+    const getData = await axios.post(`${api}remove_prepurchase_order`, obj).then((response) => {
       console.log()
-      const msg = getData.message;
-      setDeleteFaild(msg);
       return response.data;
     });
+    if (getData.status === 'success') {
+      const getRows = getData.data;
+      window.location.reload(false);
+      navigate('/PurchaseOrder', {replace: true});
+    } else {
+      const msg = getData.message;
+    }
   }
  
    const editUser = async (id) =>{
