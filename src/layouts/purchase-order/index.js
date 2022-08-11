@@ -17,6 +17,7 @@ Coded by www.creative-tim.com
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./customer.css";
+import {useNavigate} from 'react-router-dom';
 
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
@@ -39,6 +40,7 @@ import DataTable from "examples/Tables/DataTable";
 // Data
 import projectsTableData from "layouts/tables/data/projectsTableData";
 import Moment from 'moment';
+import { useMaterialUIController } from "context";
 
 import { userID } from "../../auth";
 
@@ -49,6 +51,7 @@ function PurchaseOrder() {
   const { columns: pColumns, rows: pRows } = projectsTableData();
   const [ isAddEnable, setAddEnable ] = useState(false);
   const [isLoginFaild, setLoginFaild] = useState(false);
+  const [isDeleteFaild, setDeleteFaild] = useState(false);
   const [user_id, setUserID] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [order_no, setOrder_no] = useState('');
@@ -71,6 +74,7 @@ function PurchaseOrder() {
   const [total_amount, setTotalAmount] = useState('');
   const [purchase_note, setPurchaseNote] = useState('');
   const [productList, setProductList] = useState('');
+  const navigate = useNavigate();
   const [inputList, setInputList] = useState([{ product_name: "",
                                               description : "",
                                               hsn: "",
@@ -115,13 +119,16 @@ function PurchaseOrder() {
        setLoginFaild(false);
        setOrder_no('');
        setName('');
+       setVendor_gst('');
        setDeliveryDate('');
        setDeliveryAddress('');
        setShipment_prefrence('');
        setPurchaseOrderDate('');
        setMobileNumber('');
        setVendorAddress('');
+       setPlace('');
        setDeliveryTo('');
+       setTaxtype('');
        setSubTotal('');
        setCGST('');
        setSGST('');
@@ -196,10 +203,12 @@ function PurchaseOrder() {
          setName('');
          setDeliveryAddress('');
          setDeliveryDate('');
+         setPlace('');
          setShipment_prefrence('');
          setPurchaseOrderDate('');
          setVendorAddress('');
          setDeliveryTo('');
+         setTaxtype('');
          setSubTotal('');
          setCGST('');
          setSGST('');
@@ -303,6 +312,25 @@ function PurchaseOrder() {
       </MDTypography>
     </MDTypography>
   );
+
+  const deleteUser = async (id) =>{
+    setPurchaseId(id);
+    alert("Are you sure you want to delete this Order?");
+    const obj = {
+      "purchase_id": id
+    }
+    const getData = await axios.post(`${api}remove_prepurchase_order`, obj).then((response) => {
+      console.log()
+      return response.data;
+    });
+    if (getData.status === 'success') {
+      const getRows = getData.data;
+      window.location.reload(false);
+      navigate('/PurchaseOrder', {replace: true});
+    } else {
+      const msg = getData.message;
+    }
+  }
  
    const editUser = async (id) =>{
       setPurchaseId(id);
@@ -341,6 +369,9 @@ function PurchaseOrder() {
        }  
   }
 
+  const [controller] = useMaterialUIController();
+  const { darkMode } = controller;
+
   const generateRow = async (getData) =>{
     const row = [];
     if(getData && getData.length > 0)
@@ -348,20 +379,22 @@ function PurchaseOrder() {
       getData.forEach((element, index) => {
         row.push({
           s_no: index+1,
-          purchase_date: Moment(element.date__c).format('DD MMMM yyyy'),
+          purchase_date: Moment(element.date__c).format('DD/MM/yyyy'),
           vendor_name: element.vendor_name__c,
           amount: element.total_amount__c,
           purchase_no:element.purchase_order_no__c,
           status: element.status__c,
           action: (
-            <MDBox> 
-            <MDTypography style={{cursor:'pointer'}} onClick={()=>editUser(element.id)} component="a" color="text">
-              <Icon>edit</Icon>
-            </MDTypography>
-            <MDTypography style={{cursor:'pointer' , paddingLeft:'10px'}} onClick={()=>editUser(element.id)} component="a" color="text">
-              <Icon>delete</Icon>
-            </MDTypography>
-          </MDBox>  
+            <MDBox display="flex" alignItems="center" mt={{ xs: 2, sm: 0 }} ml={{ xs: -1.5, sm: 0 }}>
+            <MDBox mr={1}>
+              <MDButton variant="text" color="error" onClick={()=>deleteUser(element.id)} component="a" >
+                <Icon>delete</Icon>&nbsp;delete
+              </MDButton>
+            </MDBox>
+            <MDButton variant="text" color={darkMode ? "white" : "dark"}  onClick={()=>editUser(element.id)} component="a">
+              <Icon>edit</Icon>&nbsp;edit
+            </MDButton>
+          </MDBox>             
           ),
         })
       })
@@ -381,8 +414,7 @@ function PurchaseOrder() {
       if (getData.status === 'success') {
     const row = [];
         const getRows = getData.data;
-      
-    setProductList(getRows);
+        setProductList(getRows);
       } else {
         const msg = getData.message;
       }

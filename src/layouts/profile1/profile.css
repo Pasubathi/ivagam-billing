@@ -8,3 +8,19 @@
     height: 2em;
     top: calc(50% - 1em);
 }
+.App {
+    font-family: sans-serif;
+
+  }
+  .image-item {
+    display: flex;
+    margin: 10px 0;
+  }
+  .image-item__btn-wrapper {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+  }
+  button {
+    height: 20px;
+  }
