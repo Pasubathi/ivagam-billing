@@ -36,6 +36,8 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
+import ImageUploading from "react-images-uploading";
+import { useMaterialUIController } from "context";
 
 // Data
 import projectsTableData from "layouts/tables/data/projectsTableData";
@@ -52,7 +54,6 @@ function Products() {
   const [product_id, setProductId] = useState('');
   const [user_id, setUserID] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
-  const [image, setImage] = useState('');
   const [productname, setProductName] = useState('');
   const [productcategory, setProductCategory] = useState('');
   const [sku, setSKU] = useState('');
@@ -65,12 +66,18 @@ function Products() {
   const [sales_description, setSaleDes] = useState('');
   const [purchase_rate, setPurchaseRate] = useState('');
   const [purchase_description, setPurchaseDes] = useState('');
-
+  const [images, setImages] = useState('');
+  const maxNumber = 69;
+  const onChange = (imageList, addUpdateIndex) => {
+    // data for submit
+    console.log(imageList, addUpdateIndex);
+    setImages(imageList);
+}
   const handleUpdate = async (event) =>{
     event.preventDefault();
     const formdata = new FormData();
     formdata.append('product_id', product_id);
-    formdata.append('image', image);
+    formdata.append('image', images[0].file);
     formdata.append('name', productname);
     formdata.append('type', followsMe);
     formdata.append('category', productcategory);
@@ -104,7 +111,7 @@ function Products() {
     event.preventDefault();
     const formdata = new FormData();
     formdata.append('user_id', user_id);
-    formdata.append('image', image);
+    formdata.append('image', images[0].file);
     formdata.append('name', productname);
     formdata.append('type', followsMe);
     formdata.append('category', productcategory);
@@ -166,7 +173,7 @@ function Products() {
      if (getData.status === 'success') {
         const getRows = getData.data;
         setAddEnable(true);
-        setImage(getRows && getRows.image__c?getRows.image__c:'');
+        setImages(getRows && getRows.image__c?getRows.image__c:'');
         setProductName(getRows && getRows.name__c?getRows.name__c:'');
         setProductCategory(getRows && getRows.category__c?getRows.category__c:'');
         setSKU(getRows && getRows.sku__c?getRows.sku__c:'');
@@ -184,6 +191,9 @@ function Products() {
      }
 }
 
+const [controller] = useMaterialUIController();
+const { darkMode } = controller;
+
   const generateRow = async (getData) =>{
     const row = [];
     if(getData && getData.length > 0)
@@ -198,11 +208,11 @@ function Products() {
           HSN: element.hsn_code__c,
           action: (
             <>
-            <MDTypography style={{cursor:'pointer',fontSize:"15px"}} onClick={()=>editUser(element.id)} component="a" color="text">
-              edit
+            <MDTypography style={{cursor:'pointer',fontSize:"15px"}} color={darkMode ? "white" : "dark"} onClick={()=>editUser(element.id)} component="a" >
+            <Icon>edit</Icon>&nbsp;edit
             </MDTypography>
-            <MDTypography style={{cursor:'pointer',paddingLeft:"13px",fontSize:"15px"}} component="a" color="text">
-            delete
+            <MDTypography style={{cursor:'pointer',paddingLeft:"25px",fontSize:"15px"}} component="a" color="error">
+            <Icon>delete</Icon>&nbsp;delete
           </MDTypography>
           </>
           ),
@@ -312,36 +322,46 @@ function Products() {
                 <MDBox mt={0.5}>
             <Switch checked={followsMe} onChange={() => setFollowsMe(!followsMe)} />
           </MDBox>
-                <div className="Neon Neon-theme-dragdropbox">
-                <input
-                  style={{
-                    zIndex: 999,
-                    opacity: 0,
-                    width: 320,
-                    height: 200,
-                    position: "absolute",
-                    right: 0,
-                    left: 0,
-                    marginRight: "auto",
-                    marginLeft: "auto"
-                  }}
-                  name="fileToUpload"
-                  id="fileToUpload"
-                  onChange={(e)=>setImage(e.target.value)} value={image}
-                  type="file"
-                />
-                <div className="Neon-input-dragDrop">
-                  <div className="Neon-input-inner">
-                    <div className="Neon-input-icon">
-                      <i className="fa fa-file-image-o" />
-                    </div>
-                    <div className="Neon-input-text">
-                      <h3>image</h3>
-                      <span style={{ display: "inline-block", margin: "15px 0" }}>Upload</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+          <ImageUploading
+                        single
+                        value={images}
+                        onChange={onChange}
+                        maxNumber={maxNumber}
+                        dataURLKey="data_url"
+                        acceptType={["jpg","png"]}
+                      >
+                        {({
+                          imageList,
+                          onImageUpload,
+                          onImageUpdate,
+                          onImageRemove,
+                          isDragging,
+                          dragProps
+                        }) => (
+                          // write your building UI
+                          <div className="upload__image-wrapper" style={{marginLeft:"260px",marginBottom:"30px"}}>
+                            <MDButton type="button"
+                              style={isDragging ? { color: "red" } : null}
+                              onClick={onImageUpload}
+                              {...dragProps}
+                              color="dark"
+                            >
+                              Image Upload
+                            </MDButton>
+                            &nbsp;
+                    
+                            {imageList.map((image, index) => (
+                              <div className="image-item">
+                                <img src={image.data_url} alt="" height="100" name="image" value={images} onChange={(e)=>setImages(e.target.value)} width="100"/>
+                                <div className="image-item__btn-wrapper">
+                                  <MDButton type="button" color="success" onClick={() => onImageUpdate(index)}>Update</MDButton>
+                                  <MDButton type="button" color="error" onClick={() => onImageRemove(index)}>Remove</MDButton>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </ImageUploading>
                <MDBox mb={2} mx={4}>
                   <MDInput type="text" label="Product Name*" onChange={(e)=>setProductName(e.target.value)} value={productname} fullWidth />
                 </MDBox>
